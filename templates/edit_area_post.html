@@ -1,0 +1,211 @@
+{% extends "admin_base.html" %}
+
+{% block title %}RED HOT - Editar Post{% endblock %}
+
+{% block content %}
+<div class="edit-post-container">
+    <div class="edit-header">
+        <h1>Editar Post</h1>
+    </div>
+
+    <form method="POST" enctype="multipart/form-data" class="edit-form">
+        <div class="form-group">
+            <label for="titulo">Título</label>
+            <input type="text" id="titulo" name="titulo" value="{{ post.titulo }}" required>
+        </div>
+
+        <div class="form-group">
+            <label for="descricao">Descrição</label>
+            <textarea id="descricao" name="descricao" rows="6" required>{{ post.descricao }}</textarea>
+        </div>
+
+        <div class="form-group">
+            <label>Imagem Atual</label>
+            <div class="current-image">
+                {% if post.foto %}
+                <img src="{{ post.foto }}" alt="Imagem atual">
+                {% else %}
+                <p>Nenhuma imagem</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="nova_foto">Nova Imagem (opcional)</label>
+            <input type="file" id="nova_foto" name="nova_foto" accept="image/*">
+            <div id="image-preview" class="image-preview"></div>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn-save">
+                <i class="fas fa-save"></i> Salvar Alterações
+            </button>
+            <a href="{{ url_for('admin_area_posts', area_id=post.area_id) }}" class="btn-cancel">
+                <i class="fas fa-times"></i> Cancelar
+            </a>
+        </div>
+    </form>
+</div>
+
+<script>
+document.getElementById('nova_foto').addEventListener('change', function(e) {
+    const preview = document.getElementById('image-preview');
+    preview.innerHTML = '';
+    
+    if (this.files && this.files[0]) {
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+            const img = document.createElement('img');
+            img.src = e.target.result;
+            preview.appendChild(img);
+        }
+        
+        reader.readAsDataURL(this.files[0]);
+    }
+});
+</script>
+{% endblock %}
+
+{% block extra_styles %}
+<style>
+    .edit-post-container {
+        max-width: 800px;
+        width: 95%;
+        margin: 80px auto 40px;
+        min-height: calc(100vh - 200px);
+    }
+
+    .edit-header {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    .edit-header h1 {
+        color: #ff0000;
+        font-size: 1.8em;
+        font-weight: 300;
+        margin: 0;
+    }
+
+    .edit-form {
+        background: #1a1a1a;
+        padding: 30px;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .form-group {
+        margin-bottom: 25px;
+    }
+
+    .form-group label {
+        display: block;
+        color: #fff;
+        margin-bottom: 8px;
+        font-size: 0.95em;
+    }
+
+    .form-group input[type="text"],
+    .form-group textarea {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #333;
+        border-radius: 4px;
+        background: #0f0f0f;
+        color: #fff;
+        font-size: 0.95em;
+        transition: border-color 0.2s;
+    }
+
+    .form-group input[type="text"]:focus,
+    .form-group textarea:focus {
+        border-color: #ff0000;
+        outline: none;
+    }
+
+    .form-group input[type="file"] {
+        display: block;
+        margin-top: 8px;
+    }
+
+    .current-image {
+        margin-top: 10px;
+        max-width: 300px;
+    }
+
+    .current-image img {
+        width: 100%;
+        height: auto;
+        border-radius: 4px;
+    }
+
+    .image-preview {
+        margin-top: 15px;
+        max-width: 300px;
+    }
+
+    .image-preview img {
+        width: 100%;
+        height: auto;
+        border-radius: 4px;
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 15px;
+        margin-top: 30px;
+    }
+
+    .btn-save, .btn-cancel {
+        padding: 10px 20px;
+        border-radius: 4px;
+        font-size: 0.95em;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        text-decoration: none;
+    }
+
+    .btn-save {
+        background-color: #ff0000;
+        color: #fff;
+        border: none;
+        flex: 1;
+    }
+
+    .btn-cancel {
+        background-color: #333;
+        color: #fff;
+        border: none;
+        flex: 1;
+        justify-content: center;
+    }
+
+    .btn-save:hover, .btn-cancel:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    @media (max-width: 768px) {
+        .edit-post-container {
+            margin: 60px auto 20px;
+        }
+
+        .edit-form {
+            padding: 20px;
+        }
+
+        .form-actions {
+            flex-direction: column;
+        }
+
+        .btn-save, .btn-cancel {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+</style>
+{% endblock %} 

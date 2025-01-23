@@ -1,0 +1,385 @@
+{% extends "admin_base.html" %}
+
+{% block title %}RED HOT - Gerenciamento de Notícias{% endblock %}
+
+{% block header_title %}Gerenciamento de Notícias{% endblock %}
+
+{% block extra_styles %}
+<style>
+    .noticias-container {
+        padding: 20px;
+    }
+
+    .add-noticia {
+        background: #151515;
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 30px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        border: 1px solid #333;
+    }
+
+    .add-noticia h3 {
+        color: #ff0000;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #333;
+    }
+
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 5px;
+        color: #fff;
+    }
+
+    .form-group select,
+    .form-group input[type="text"] {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #333;
+        border-radius: 4px;
+        background: #1a1a1a;
+        color: #fff;
+    }
+
+    .form-group textarea {
+        width: 100%;
+        min-height: 200px;
+        padding: 12px;
+        border: 1px solid #333;
+        border-radius: 4px;
+        background: #1a1a1a;
+        color: #fff;
+        font-family: Arial, sans-serif;
+        font-size: 14px;
+        line-height: 1.5;
+        resize: vertical;
+        transition: border-color 0.3s;
+    }
+
+    .form-group textarea:focus {
+        outline: none;
+        border-color: #007bff;
+        box-shadow: 0 0 0 2px rgba(0,123,255,0.25);
+    }
+
+    .editor-toolbar {
+        display: flex;
+        gap: 5px;
+        margin-bottom: 10px;
+        flex-wrap: wrap;
+    }
+
+    .editor-btn {
+        background: #333;
+        color: white;
+        border: none;
+        padding: 5px 10px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 0.9em;
+        transition: background 0.3s;
+    }
+
+    .editor-btn:hover {
+        background: #444;
+    }
+
+    .editor-btn.active {
+        background: #007bff;
+    }
+
+    .btn-submit {
+        background: #ff0000;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        width: 100%;
+        font-size: 1em;
+        transition: background 0.3s;
+    }
+
+    .btn-submit:hover {
+        background: #cc0000;
+    }
+
+    .noticias-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 20px;
+    }
+
+    .noticia-card {
+        background: #151515;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        border: 1px solid #333;
+        transition: transform 0.2s;
+    }
+
+    .noticia-card:hover {
+        transform: translateY(-2px);
+    }
+
+    .noticia-header {
+        background: #222;
+        padding: 15px;
+        border-bottom: 1px solid #333;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .noticia-tipo {
+        background: #ff0000;
+        color: white;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 0.85em;
+    }
+
+    .noticia-titulo {
+        color: #fff;
+        margin: 0;
+        font-size: 1.2em;
+        padding: 15px;
+        border-bottom: 1px solid #333;
+    }
+
+    .noticia-img {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+    }
+
+    .noticia-descricao {
+        padding: 15px;
+        color: #ccc;
+        max-height: 200px;
+        overflow-y: auto;
+    }
+
+    .noticia-footer {
+        padding: 15px;
+        border-top: 1px solid #333;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        color: #888;
+        font-size: 0.9em;
+    }
+
+    .btn-remove {
+        background: #ff0000;
+        color: white;
+        padding: 6px 12px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 0.9em;
+        transition: background 0.3s;
+    }
+
+    .btn-remove:hover {
+        background: #cc0000;
+    }
+
+    .empty-message {
+        text-align: center;
+        padding: 40px;
+        color: #666;
+        font-style: italic;
+        background: #151515;
+        border-radius: 10px;
+        border: 1px solid #333;
+    }
+
+    .navigation-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+
+    .btn-back {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 15px;
+        border-radius: 4px;
+        text-decoration: none;
+        font-size: 0.85em;
+        background-color: #6c757d;
+        color: white;
+        transition: opacity 0.2s;
+    }
+
+    .btn-back:hover {
+        opacity: 0.9;
+        text-decoration: none;
+        color: white;
+    }
+
+    /* Scrollbar personalizada */
+    .noticia-descricao::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .noticia-descricao::-webkit-scrollbar-track {
+        background: #1a1a1a;
+        border-radius: 3px;
+    }
+
+    .noticia-descricao::-webkit-scrollbar-thumb {
+        background: #333;
+        border-radius: 3px;
+    }
+
+    .noticia-descricao::-webkit-scrollbar-thumb:hover {
+        background: #444;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="noticias-container">
+    <div class="navigation-buttons">
+        <a href="{{ url_for('admin_dashboard') }}" class="btn-back">
+            <i class="fas fa-arrow-left"></i>
+            Voltar ao Painel
+        </a>
+    </div>
+
+    <div class="add-noticia">
+        <h3>Adicionar Notícia/Aviso</h3>
+        <form action="{{ url_for('add_noticia') }}" method="POST" enctype="multipart/form-data">
+            <div class="form-group">
+                <label>Tipo:</label>
+                <select name="tipo" required>
+                    <option value="noticia">Notícia</option>
+                    <option value="aviso">Aviso</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Título:</label>
+                <input type="text" name="titulo" required placeholder="Digite o título">
+            </div>
+            <div class="form-group">
+                <label>Descrição:</label>
+                <div class="editor-toolbar">
+                    <button type="button" class="editor-btn" onclick="formatText('bold')" title="Negrito">
+                        <i class="fas fa-bold"></i>
+                    </button>
+                    <button type="button" class="editor-btn" onclick="formatText('italic')" title="Itálico">
+                        <i class="fas fa-italic"></i>
+                    </button>
+                    <button type="button" class="editor-btn" onclick="formatText('underline')" title="Sublinhado">
+                        <i class="fas fa-underline"></i>
+                    </button>
+                    <button type="button" class="editor-btn" onclick="insertList('ul')" title="Lista não ordenada">
+                        <i class="fas fa-list-ul"></i>
+                    </button>
+                    <button type="button" class="editor-btn" onclick="insertList('ol')" title="Lista ordenada">
+                        <i class="fas fa-list-ol"></i>
+                    </button>
+                    <button type="button" class="editor-btn" onclick="formatText('link')" title="Inserir link">
+                        <i class="fas fa-link"></i>
+                    </button>
+                </div>
+                <textarea name="descricao" id="editor-descricao" required placeholder="Digite a descrição"></textarea>
+            </div>
+            <div class="form-group">
+                <label>Foto (PNG, JPG, GIF - Máx: 100MB):</label>
+                <input type="file" name="foto" accept=".png,.jpg,.jpeg,.gif" class="file-input">
+            </div>
+            <button type="submit" class="btn-submit">Publicar</button>
+        </form>
+    </div>
+
+    <div class="noticias-list">
+        {% if noticias %}
+            {% for noticia in noticias %}
+            <div class="noticia-card">
+                <div class="noticia-header">
+                    <span class="noticia-tipo">{{ 'Notícia' if noticia.tipo == 'noticia' else 'Aviso' }}</span>
+                    <a href="{{ url_for('remove_noticia', noticia_id=noticia.id) }}" class="btn-remove" onclick="return confirm('Tem certeza que deseja remover esta notícia/aviso?')">
+                        Remover
+                    </a>
+                </div>
+                <h3 class="noticia-titulo">{{ noticia.titulo }}</h3>
+                {% if noticia.foto %}
+                <img src="{{ noticia.foto }}" alt="Imagem da notícia" class="noticia-img">
+                {% endif %}
+                <div class="noticia-descricao">{{ noticia.descricao|safe }}</div>
+                <div class="noticia-footer">
+                    <span>Por: {{ noticia.autor.username }}</span>
+                    <span>{{ noticia.created_at.strftime('%d/%m/%Y %H:%M') }}</span>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+        <div class="empty-message">
+            <p>Nenhuma notícia ou aviso publicado.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+function formatText(command) {
+    const textarea = document.getElementById('editor-descricao');
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const text = textarea.value;
+    let formattedText = '';
+
+    switch(command) {
+        case 'bold':
+            formattedText = `<strong>${text.substring(start, end)}</strong>`;
+            break;
+        case 'italic':
+            formattedText = `<em>${text.substring(start, end)}</em>`;
+            break;
+        case 'underline':
+            formattedText = `<u>${text.substring(start, end)}</u>`;
+            break;
+        case 'link':
+            const url = prompt('Digite a URL do link:');
+            if (url) {
+                formattedText = `<a href="${url}">${text.substring(start, end)}</a>`;
+            }
+            break;
+    }
+
+    if (formattedText) {
+        textarea.value = text.substring(0, start) + formattedText + text.substring(end);
+        textarea.focus();
+    }
+}
+
+function insertList(type) {
+    const textarea = document.getElementById('editor-descricao');
+    const start = textarea.selectionStart;
+    const text = textarea.value;
+    let listText = '';
+
+    if (type === 'ul') {
+        listText = '\n<ul>\n  <li>Item 1</li>\n  <li>Item 2</li>\n  <li>Item 3</li>\n</ul>\n';
+    } else {
+        listText = '\n<ol>\n  <li>Item 1</li>\n  <li>Item 2</li>\n  <li>Item 3</li>\n</ol>\n';
+    }
+
+    textarea.value = text.substring(0, start) + listText + text.substring(start);
+    textarea.focus();
+}
+</script>
+{% endblock %} 

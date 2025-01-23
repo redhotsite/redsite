@@ -1,0 +1,135 @@
+{% extends "admin_base.html" %}
+
+{% block title %}Gerenciamento de Aprovações{% endblock %}
+
+{% block header_title %}
+<div style="display: flex; align-items: center; gap: 20px;">
+    <a href="{{ url_for('admin_dashboard') }}" class="btn-back">
+        <i class="fas fa-arrow-left"></i> Voltar ao Painel
+    </a>
+    <span>Gerenciamento de Aprovações</span>
+</div>
+{% endblock %}
+
+{% block extra_style %}
+<style>
+    .approval-list {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+
+    .approval-list th, .approval-list td {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    }
+
+    .approval-list th {
+        background-color: #f5f5f5;
+        font-weight: bold;
+    }
+
+    .approval-list tr:hover {
+        background-color: #f9f9f9;
+    }
+
+    .actions {
+        display: flex;
+        gap: 10px;
+    }
+
+    .btn-approve {
+        background-color: #4CAF50;
+        color: white;
+        padding: 8px 16px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        text-decoration: none;
+        font-size: 0.9em;
+    }
+
+    .btn-reject {
+        background-color: #f44336;
+        color: white;
+        padding: 8px 16px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        text-decoration: none;
+        font-size: 0.9em;
+    }
+
+    .btn-approve:hover {
+        background-color: #45a049;
+    }
+
+    .btn-reject:hover {
+        background-color: #da190b;
+    }
+
+    .status-pending {
+        color: #ff9800;
+        font-weight: 500;
+    }
+
+    .empty-message {
+        text-align: center;
+        padding: 40px;
+        color: #666;
+        font-style: italic;
+    }
+
+    .btn-back {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 15px;
+        border-radius: 4px;
+        text-decoration: none;
+        font-size: 0.85em;
+        background-color: #6c757d;
+        color: white;
+        transition: opacity 0.2s;
+    }
+
+    .btn-back:hover {
+        opacity: 0.9;
+        text-decoration: none;
+        color: white;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+{% if pending_users %}
+<table class="approval-list">
+    <thead>
+        <tr>
+            <th>Usuário</th>
+            <th>Data de Solicitação</th>
+            <th>Status</th>
+            <th>Ações</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for pending in pending_users %}
+        <tr>
+            <td>{{ pending.username }}</td>
+            <td>{{ pending.created_at.strftime('%d/%m/%Y %H:%M') }}</td>
+            <td class="status-pending">Pendente</td>
+            <td class="actions">
+                <a href="{{ url_for('approve_user', user_id=pending.id, action='approve') }}" class="btn-approve">Aprovar</a>
+                <a href="{{ url_for('approve_user', user_id=pending.id, action='reject') }}" class="btn-reject">Rejeitar</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<div class="empty-message">
+    <p>Não há solicitações de cadastro pendentes no momento.</p>
+</div>
+{% endif %}
+{% endblock %} 

@@ -1,0 +1,131 @@
+{% extends "area_18_base.html" %}
+
+{% block section_title %}Comunidade +18{% endblock %}
+
+{% block section_header %}Comunidade +18{% endblock %}
+
+{% block section_styles %}
+.post-card {
+    display: flex;
+    flex-direction: column;
+}
+
+.post-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.post-description {
+    flex: 1;
+}
+
+.post-interactions {
+    display: flex;
+    gap: 15px;
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #222;
+}
+
+.interaction-btn {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: #666;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.interaction-btn:hover {
+    color: #ff0000;
+    text-decoration: none;
+}
+
+.interaction-count {
+    font-size: 0.9em;
+}
+
+.post-comments {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #222;
+}
+
+.comment {
+    margin-bottom: 10px;
+    padding: 10px;
+    background: #1a1a1a;
+    border-radius: 4px;
+}
+
+.comment-author {
+    color: #ff0000;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.comment-text {
+    color: #ccc;
+    font-size: 0.9em;
+}
+{% endblock %}
+
+{% block content %}
+<div class="area-18-container">
+    <div class="warning-banner">
+        ⚠️ Área restrita para maiores de 18 anos. Todo o conteúdo aqui é sensível e explícito.
+    </div>
+
+    <div class="btn-container">
+        <a href="{{ url_for('area_18') }}" class="btn-back">
+            <i class="fas fa-arrow-left"></i> Voltar para Área +18
+        </a>
+    </div>
+
+    {% if posts %}
+    <div class="posts-grid">
+        {% for post in posts %}
+        <div class="post-card">
+            <div class="post-header">
+                <h3 class="post-title">{{ post.titulo }}</h3>
+            </div>
+            {% if post.foto %}
+            <img src="{{ post.foto }}" alt="{{ post.titulo }}" class="post-image">
+            {% endif %}
+            <div class="post-content">
+                <div class="post-description">{{ post.descricao|safe }}</div>
+                <div class="post-interactions">
+                    <a href="#" class="interaction-btn">
+                        <i class="fas fa-heart"></i>
+                        <span class="interaction-count">0</span>
+                    </a>
+                    <a href="#" class="interaction-btn">
+                        <i class="fas fa-comment"></i>
+                        <span class="interaction-count">0</span>
+                    </a>
+                    <a href="#" class="interaction-btn">
+                        <i class="fas fa-share"></i>
+                        <span class="interaction-count">0</span>
+                    </a>
+                </div>
+                <div class="post-meta">
+                    <div class="post-author">
+                        <i class="fas fa-user"></i>
+                        {{ post.autor.username }}
+                    </div>
+                    <div class="post-date">
+                        {{ post.created_at.strftime('%d/%m/%Y %H:%M') }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-message">
+        Nenhum post disponível na comunidade.
+    </div>
+    {% endif %}
+</div>
+{% endblock %} 

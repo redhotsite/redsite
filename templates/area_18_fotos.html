@@ -1,0 +1,234 @@
+{% extends "area_18_base.html" %}
+
+{% block section_title %}Fotos +18{% endblock %}
+
+{% block section_header %}Fotos +18{% endblock %}
+
+{% block section_styles %}
+.post-image {
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+.post-image:hover {
+    transform: scale(1.02);
+}
+
+.post-card {
+    position: relative;
+}
+
+.post-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.post-card:hover .post-overlay {
+    opacity: 1;
+}
+
+.post-overlay-icon {
+    color: white;
+    font-size: 2em;
+}
+
+/* Estilos do Modal */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.9);
+    z-index: 1000;
+    overflow: hidden;
+}
+
+.modal-content {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-image {
+    max-width: 90%;
+    max-height: 90vh;
+    object-fit: contain;
+}
+
+.close-modal {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    color: white;
+    font-size: 30px;
+    cursor: pointer;
+    z-index: 1001;
+    background: rgba(0, 0, 0, 0.5);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.close-modal:hover {
+    background: rgba(255, 0, 0, 0.5);
+    transform: rotate(90deg);
+}
+
+.modal-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    color: white;
+    font-size: 30px;
+    cursor: pointer;
+    background: rgba(0, 0, 0, 0.5);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.modal-nav:hover {
+    background: rgba(255, 0, 0, 0.5);
+}
+
+.modal-prev {
+    left: 20px;
+}
+
+.modal-next {
+    right: 20px;
+}
+{% endblock %}
+
+{% block content %}
+<div class="area-18-container">
+    <div class="warning-banner">
+        ⚠️ Área restrita para maiores de 18 anos. Todo o conteúdo aqui é sensível e explícito.
+    </div>
+
+    <div class="btn-container">
+        <a href="{{ url_for('area_18') }}" class="btn-back">
+            <i class="fas fa-arrow-left"></i> Voltar para Área +18
+        </a>
+    </div>
+
+    {% if posts %}
+    <div class="posts-grid">
+        {% for post in posts %}
+        <div class="post-card">
+            <div class="post-header">
+                <h3 class="post-title">{{ post.titulo }}</h3>
+            </div>
+            {% if post.foto %}
+            <img src="{{ post.foto }}" alt="{{ post.titulo }}" class="post-image" onclick="openModal('{{ post.foto }}', {{ loop.index0 }})">
+            {% endif %}
+            <div class="post-content">
+                <div class="post-description">{{ post.descricao|safe }}</div>
+                <div class="post-meta">
+                    <div class="post-author">
+                        <i class="fas fa-user"></i>
+                        {{ post.autor.username }}
+                    </div>
+                    <div class="post-date">
+                        {{ post.created_at.strftime('%d/%m/%Y %H:%M') }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-message">
+        Nenhuma foto disponível nesta seção.
+    </div>
+    {% endif %}
+</div>
+
+<!-- Modal para exibir fotos em tela cheia -->
+<div id="imageModal" class="modal">
+    <span class="close-modal" onclick="closeModal()">
+        <i class="fas fa-times"></i>
+    </span>
+    <span class="modal-nav modal-prev" onclick="changeImage(-1)">
+        <i class="fas fa-chevron-left"></i>
+    </span>
+    <span class="modal-nav modal-next" onclick="changeImage(1)">
+        <i class="fas fa-chevron-right"></i>
+    </span>
+    <div class="modal-content">
+        <img id="modalImage" class="modal-image" src="" alt="Foto em tela cheia">
+    </div>
+</div>
+
+<script>
+let currentImageIndex = 0;
+const images = [{% for post in posts %}{% if post.foto %}'{{ post.foto }}'{% if not loop.last %}, {% endif %}{% endif %}{% endfor %}];
+
+function openModal(imageSrc, index) {
+    const modal = document.getElementById('imageModal');
+    const modalImg = document.getElementById('modalImage');
+    modal.style.display = 'block';
+    modalImg.src = imageSrc;
+    currentImageIndex = index;
+    
+    // Desabilitar scroll da página
+    document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+    const modal = document.getElementById('imageModal');
+    modal.style.display = 'none';
+    
+    // Habilitar scroll da página
+    document.body.style.overflow = 'auto';
+}
+
+function changeImage(direction) {
+    currentImageIndex = (currentImageIndex + direction + images.length) % images.length;
+    const modalImg = document.getElementById('modalImage');
+    modalImg.src = images[currentImageIndex];
+}
+
+// Fechar modal ao clicar fora da imagem
+document.getElementById('imageModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeModal();
+    }
+});
+
+// Controles do teclado
+document.addEventListener('keydown', function(e) {
+    if (document.getElementById('imageModal').style.display === 'block') {
+        if (e.key === 'Escape') {
+            closeModal();
+        } else if (e.key === 'ArrowLeft') {
+            changeImage(-1);
+        } else if (e.key === 'ArrowRight') {
+            changeImage(1);
+        }
+    }
+});
+</script>
+{% endblock %} 

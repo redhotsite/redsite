@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RED HOT - Gerenciamento de Destaques</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            background-color: #0a0a0a;
+            color: #fff;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+
+        .destaques-container {
+            background-color: #151515;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h2 {
+            color: #ff0000;
+            margin: 0;
+            font-size: 24px;
+        }
+
+        .destaques-grid {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 30px;
+            margin-top: 20px;
+        }
+
+        .add-destaque {
+            background-color: #1a1a1a;
+            border: 1px solid #2a2a2a;
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .add-destaque h3 {
+            color: #ff0000;
+            margin: 0 0 20px 0;
+            font-size: 18px;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #fff;
+        }
+
+        .form-group select,
+        .form-group input[type="file"] {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #2a2a2a;
+            border-radius: 4px;
+            background-color: #252525;
+            color: #fff;
+        }
+
+        .form-group select:focus,
+        .form-group input[type="file"]:focus {
+            border-color: #ff0000;
+            outline: none;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 10px;
+            background-color: #ff0000;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .submit-btn:hover {
+            background-color: #cc0000;
+            transform: translateY(-2px);
+        }
+
+        .destaques-list {
+            background-color: #1a1a1a;
+            border: 1px solid #2a2a2a;
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .destaque-card {
+            background-color: #252525;
+            border: 1px solid #2a2a2a;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .destaque-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .destaque-header h4 {
+            color: #ff0000;
+            margin: 0;
+        }
+
+        .destaque-content {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .destaque-foto {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #ff0000;
+        }
+
+        .destaque-info {
+            flex-grow: 1;
+        }
+
+        .destaque-info p {
+            margin: 5px 0;
+            color: #ccc;
+        }
+
+        .remove-btn {
+            background-color: transparent;
+            border: 1px solid #ff0000;
+            color: #ff0000;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .remove-btn:hover {
+            background-color: #ff0000;
+            color: white;
+        }
+
+        .empty-message {
+            text-align: center;
+            color: #ccc;
+            padding: 20px;
+        }
+
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            padding: 8px 20px;
+            background-color: #ff0000;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .back-button:hover {
+            background-color: #cc0000;
+            transform: translateY(-2px);
+        }
+
+        .back-button i {
+            margin-right: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="destaques-container">
+            <div class="header">
+                <h2>Gerenciamento de Destaques</h2>
+            </div>
+
+            <div class="destaques-grid">
+                <div class="add-destaque">
+                    <h3>Adicionar Destaque</h3>
+                    <form action="{{ url_for('add_destaque') }}" method="POST" enctype="multipart/form-data">
+                        <div class="form-group">
+                            <label for="tipo">Tipo de Destaque:</label>
+                            <select name="tipo" id="tipo" required>
+                                <option value="semana">Destaque da Semana</option>
+                                <option value="mes">Destaque do Mês</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="user_id">Usuário:</label>
+                            <select name="user_id" id="user_id" required>
+                                {% for user in users %}
+                                <option value="{{ user.id }}">{{ user.username }} ({{ user.cargo.nome }})</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="foto">Foto (Opcional):</label>
+                            <input type="file" name="foto" id="foto" accept="image/*">
+                        </div>
+
+                        <button type="submit" class="submit-btn">Adicionar Destaque</button>
+                    </form>
+                </div>
+
+                <div class="destaques-list">
+                    <div class="destaque-card">
+                        <div class="destaque-header">
+                            <h4>Destaque da Semana</h4>
+                            {% if destaque_semana %}
+                            <a href="{{ url_for('remove_destaque', destaque_id=destaque_semana.id) }}" class="remove-btn" onclick="return confirm('Tem certeza que deseja remover este destaque?')">
+                                <i class="fas fa-times"></i> Remover
+                            </a>
+                            {% endif %}
+                        </div>
+                        {% if destaque_semana %}
+                        <div class="destaque-content">
+                            {% if destaque_semana.foto %}
+                            <img src="{{ destaque_semana.foto }}" alt="Foto do destaque" class="destaque-foto">
+                            {% endif %}
+                            <div class="destaque-info">
+                                <p><strong>Usuário:</strong> {{ destaque_semana.user.username }}</p>
+                                <p><strong>Cargo:</strong> {{ destaque_semana.user.cargo.nome }}</p>
+                                <p><strong>Data:</strong> {{ destaque_semana.created_at.strftime('%d/%m/%Y') }}</p>
+                            </div>
+                        </div>
+                        {% else %}
+                        <div class="empty-message">
+                            Nenhum destaque da semana definido
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="destaque-card">
+                        <div class="destaque-header">
+                            <h4>Destaque do Mês</h4>
+                            {% if destaque_mes %}
+                            <a href="{{ url_for('remove_destaque', destaque_id=destaque_mes.id) }}" class="remove-btn" onclick="return confirm('Tem certeza que deseja remover este destaque?')">
+                                <i class="fas fa-times"></i> Remover
+                            </a>
+                            {% endif %}
+                        </div>
+                        {% if destaque_mes %}
+                        <div class="destaque-content">
+                            {% if destaque_mes.foto %}
+                            <img src="{{ destaque_mes.foto }}" alt="Foto do destaque" class="destaque-foto">
+                            {% endif %}
+                            <div class="destaque-info">
+                                <p><strong>Usuário:</strong> {{ destaque_mes.user.username }}</p>
+                                <p><strong>Cargo:</strong> {{ destaque_mes.user.cargo.nome }}</p>
+                                <p><strong>Data:</strong> {{ destaque_mes.created_at.strftime('%d/%m/%Y') }}</p>
+                            </div>
+                        </div>
+                        {% else %}
+                        <div class="empty-message">
+                            Nenhum destaque do mês definido
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <a href="{{ url_for('admin_dashboard') }}" class="back-button">
+                <i class="fas fa-arrow-left"></i> Voltar ao Painel
+            </a>
+        </div>
+    </div>
+</body>
+</html> 

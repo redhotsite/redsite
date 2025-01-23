@@ -1,0 +1,213 @@
+{% extends "admin_base.html" %}
+
+{% block title %}Gerenciar Membros - {{ area.nome }}{% endblock %}
+
+{% block header_title %}Gerenciar Membros - {{ area.nome }}{% endblock %}
+
+{% block content %}
+<div class="area-members-container">
+    {% if user.cargo.nivel <= 5 %}
+    <div class="add-member-form">
+        <h3>Adicionar Membro</h3>
+        <form action="{{ url_for('manage_area_members', area_id=area.id) }}" method="POST">
+            <div class="form-group">
+                <label for="member_id">Selecione o Usuário:</label>
+                <select name="member_id" id="member_id" required>
+                    <option value="">Selecione...</option>
+                    {% for member in users %}
+                        {% if member not in area.users %}
+                            <option value="{{ member.id }}">{{ member.username }} ({{ member.cargo.nome }})</option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
+            </div>
+            <input type="hidden" name="action" value="add">
+            <button type="submit" class="btn-add">Adicionar Membro</button>
+        </form>
+    </div>
+    {% endif %}
+
+    <div class="members-list">
+        <h3>Membros Atuais</h3>
+        {% if area.users %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Usuário</th>
+                        <th>Cargo</th>
+                        {% if user.cargo.nivel <= 5 %}
+                            <th>Ações</th>
+                        {% endif %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for member in area.users %}
+                        <tr>
+                            <td>{{ member.username }}</td>
+                            <td>{{ member.cargo.nome }}</td>
+                            {% if user.cargo.nivel <= 5 %}
+                                <td>
+                                    <form action="{{ url_for('manage_area_members', area_id=area.id) }}" method="POST" style="display: inline;">
+                                        <input type="hidden" name="member_id" value="{{ member.id }}">
+                                        <input type="hidden" name="action" value="remove">
+                                        <button type="submit" class="btn-remove" onclick="return confirm('Tem certeza que deseja remover {{ member.username }} da área?')">Remover</button>
+                                    </form>
+                                </td>
+                            {% endif %}
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p class="empty-message">Nenhum membro cadastrado nesta área.</p>
+        {% endif %}
+    </div>
+</div>
+
+<div class="navigation-buttons">
+    <a href="{{ url_for('admin_areas') }}" class="btn-back">Voltar para Áreas</a>
+    {% if user.cargo.nivel <= 5 %}
+        <a href="{{ url_for('admin_area_posts', area_id=area.id) }}" class="btn-area">Ver Posts</a>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_styles %}
+<style>
+.area-members-container {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 30px;
+    padding: 20px;
+}
+
+@media (max-width: 1024px) {
+    .area-members-container {
+        grid-template-columns: 1fr;
+    }
+}
+
+.add-member-form {
+    background-color: #151515;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.add-member-form h3 {
+    color: #ff0000;
+    margin-bottom: 20px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    color: #fff;
+}
+
+.form-group select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #333;
+    border-radius: 4px;
+    background-color: #222;
+    color: #fff;
+}
+
+.members-list {
+    background-color: #151515;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.members-list h3 {
+    color: #ff0000;
+    margin-bottom: 20px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+th, td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #333;
+}
+
+th {
+    background-color: #222;
+    color: #fff;
+}
+
+td {
+    color: #fff;
+}
+
+.btn-add {
+    background-color: #28a745;
+    color: white;
+    padding: 8px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.85em;
+}
+
+.btn-remove {
+    background-color: #dc3545;
+    color: white;
+    padding: 8px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.85em;
+}
+
+.empty-message {
+    color: #666;
+    text-align: center;
+    padding: 20px;
+}
+
+.navigation-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.btn-back, .btn-area {
+    display: inline-flex;
+    align-items: center;
+    padding: 8px 15px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-size: 0.85em;
+    min-width: 100px;
+    justify-content: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.btn-back {
+    background-color: #6c757d;
+    color: white;
+}
+
+.btn-area {
+    background-color: #007bff;
+    color: white;
+}
+
+.btn-back:hover, .btn-area:hover {
+    opacity: 0.9;
+}
+</style>
+{% endblock %} 

@@ -1,0 +1,16 @@
+tunnel: ac6a98a6-6158-4ce4-928b-f5ffe6480f7e
+credentials-file: C:\Users\allef\.cloudflared\ac6a98a6-6158-4ce4-928b-f5ffe6480f7e.json
+protocol: http2
+loglevel: debug
+
+ingress:
+  - hostname: redhot.net.br
+    service: http://127.0.0.1:8080
+    originRequest:
+      noTLSVerify: true
+      connectTimeout: 30s
+      disableChunkedEncoding: true
+    access:
+      required: false
+      teamName: ""
+  - service: http_status:404 

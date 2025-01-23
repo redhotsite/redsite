@@ -1,0 +1,9 @@
+backups/
+__pycache__/
+*.pyc
+*.db
+*.log
+github_config.json
+.git/
+.gitignore
+.backupignore

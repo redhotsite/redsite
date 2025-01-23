@@ -1,0 +1,559 @@
+{% extends "admin_base.html" %}
+
+{% block title %}RED HOT - Gerenciamento de Usuários e Gemas{% endblock %}
+
+{% block header_title %}
+<div style="display: flex; align-items: center; gap: 20px;">
+    <a href="{{ url_for('admin_dashboard') }}" class="btn-back">
+        <i class="fas fa-arrow-left"></i> Voltar ao Painel
+    </a>
+    <span>Gerenciamento de Usuários e Gemas</span>
+</div>
+{% endblock %}
+
+{% block extra_styles %}
+<style>
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    .section {
+        background: #151515;
+        border: 1px solid #222;
+        border-radius: 8px;
+        padding: 25px;
+        margin-bottom: 30px;
+    }
+
+    .filters {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 5px;
+        color: #fff;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 8px;
+        background: #222;
+        border: 1px solid #333;
+        border-radius: 4px;
+        color: #fff;
+    }
+
+    .form-control:focus {
+        border-color: #ff0000;
+        outline: none;
+    }
+
+    .table-container {
+        overflow-x: auto;
+    }
+
+    .table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+
+    .table th,
+    .table td {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 1px solid #222;
+    }
+
+    .table th {
+        background: #222;
+        color: #ff0000;
+        font-weight: 600;
+        cursor: pointer;
+    }
+
+    .table th:hover {
+        background: #2a2a2a;
+    }
+
+    .table tbody tr:hover {
+        background: #1a1a1a;
+    }
+
+    .table td {
+        color: #fff;
+    }
+
+    .actions {
+        display: flex;
+        gap: 10px;
+    }
+
+    .btn {
+        padding: 8px 15px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary {
+        background: #ff0000;
+        color: white;
+    }
+
+    .btn-secondary {
+        background: #333;
+        color: white;
+    }
+
+    .btn:hover {
+        transform: translateY(-2px);
+        opacity: 0.9;
+    }
+
+    .badge {
+        padding: 4px 8px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .badge-primary {
+        background: #ff0000;
+        color: white;
+    }
+
+    .badge-secondary {
+        background: #333;
+        color: white;
+    }
+
+    .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        z-index: 1000;
+    }
+
+    .modal-content {
+        position: relative;
+        background: #151515;
+        margin: 10% auto;
+        padding: 20px;
+        width: 80%;
+        max-width: 500px;
+        border-radius: 8px;
+    }
+
+    .close-modal {
+        position: absolute;
+        right: 10px;
+        top: 10px;
+        font-size: 24px;
+        cursor: pointer;
+        color: #fff;
+        background: none;
+        border: none;
+    }
+
+    .close-modal:hover {
+        color: #ff0000;
+    }
+
+    .modal-header {
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #222;
+    }
+
+    .modal-title {
+        color: #ff0000;
+        margin: 0;
+    }
+
+    .pagination {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 20px;
+    }
+
+    .pagination button {
+        padding: 5px 10px;
+        background: #222;
+        border: none;
+        border-radius: 4px;
+        color: #fff;
+        cursor: pointer;
+    }
+
+    .pagination button:hover {
+        background: #333;
+    }
+
+    .pagination button.active {
+        background: #ff0000;
+    }
+
+    .sort-icon {
+        margin-left: 5px;
+    }
+
+    .sort-icon.active {
+        color: #ff0000;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="section">
+        <div class="filters">
+            <div class="form-group">
+                <label for="nome">Nome do Usuário</label>
+                <input type="text" id="nome" class="form-control" placeholder="Buscar por nome...">
+            </div>
+            <div class="form-group">
+                <label for="cargo">Cargo Hierárquico</label>
+                <select id="cargo" class="form-control">
+                    <option value="">Todos os Cargos</option>
+                    {% for cargo in cargos %}
+                    <option value="{{ cargo.id }}">{{ cargo.nome }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="area">Área</label>
+                <select id="area" class="form-control">
+                    <option value="">Todas as Áreas</option>
+                    {% for area in areas %}
+                    <option value="{{ area.id }}">{{ area.nome }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="gemas">Gemas</label>
+                <select id="gemas" class="form-control">
+                    <option value="">Todas as Gemas</option>
+                    <option value="0-100">0-100 gemas</option>
+                    <option value="101-500">101-500 gemas</option>
+                    <option value="501-1000">501-1000 gemas</option>
+                    <option value="1001+">1001+ gemas</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="table-container">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th onclick="sortTable('nome')">Nome <i class="fas fa-sort sort-icon"></i></th>
+                        <th onclick="sortTable('cargo')">Cargo Hierárquico <i class="fas fa-sort sort-icon"></i></th>
+                        <th onclick="sortTable('cargo_gema')">Cargo por Gemas <i class="fas fa-sort sort-icon"></i></th>
+                        <th onclick="sortTable('areas')">Áreas <i class="fas fa-sort sort-icon"></i></th>
+                        <th onclick="sortTable('gemas')">Total de Gemas <i class="fas fa-sort sort-icon"></i></th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="usersTable">
+                    {% for user in users %}
+                    <tr>
+                        <td>{{ user.username }}</td>
+                        <td>{{ user.cargo.nome if user.cargo else 'Sem cargo' }}</td>
+                        <td>{{ user.cargo_gema.nome if user.cargo_gema else 'Sem cargo' }}</td>
+                        <td>
+                            {% for area in user.areas %}
+                            <span class="badge badge-secondary">{{ area.nome }}</span>
+                            {% endfor %}
+                        </td>
+                        <td>{{ user.total_gemas }}</td>
+                        <td class="actions">
+                            <button class="btn btn-secondary" onclick="editarGemas({{ user.id }}, '{{ user.username }}', {{ user.total_gemas }})">
+                                <i class="fas fa-gem"></i> Editar Gemas
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="pagination" id="pagination"></div>
+    </div>
+</div>
+
+<!-- Modal de Edição de Gemas -->
+<div id="editGemasModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title">Editar Gemas do Usuário</h3>
+            <button class="close-modal" onclick="closeModal()">&times;</button>
+        </div>
+        <form id="editGemasForm" onsubmit="return salvarGemas(event)">
+            <input type="hidden" id="userId" name="user_id">
+            <div class="form-group">
+                <label>Usuário:</label>
+                <span id="userName" style="color: #fff;"></span>
+            </div>
+            <div class="form-group">
+                <label>Total Atual:</label>
+                <span id="currentGemas" style="color: #fff;"></span>
+            </div>
+            <div class="form-group">
+                <label for="quantidade">Quantidade a Adicionar/Remover</label>
+                <input type="number" id="quantidade" name="quantidade" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label>
+                    <input type="radio" name="operation" value="add" checked> Adicionar
+                </label>
+                <label style="margin-left: 15px;">
+                    <input type="radio" name="operation" value="remove"> Remover
+                </label>
+            </div>
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save"></i> Salvar
+            </button>
+        </form>
+    </div>
+</div>
+
+<script>
+let currentSort = { field: null, direction: 'asc' };
+let filteredUsers = [];
+const itemsPerPage = 10;
+let currentPage = 1;
+
+// Inicialização
+document.addEventListener('DOMContentLoaded', function() {
+    // Adiciona listeners para os filtros
+    document.getElementById('nome').addEventListener('input', applyFilters);
+    document.getElementById('cargo').addEventListener('change', applyFilters);
+    document.getElementById('area').addEventListener('change', applyFilters);
+    document.getElementById('gemas').addEventListener('change', applyFilters);
+    
+    // Carrega os dados iniciais
+    filteredUsers = Array.from(document.querySelectorAll('#usersTable tr')).map(row => ({
+        element: row,
+        nome: row.cells[0].textContent,
+        cargo: row.cells[1].textContent,
+        cargo_gema: row.cells[2].textContent,
+        areas: row.cells[3].textContent,
+        gemas: parseInt(row.cells[4].textContent) || 0
+    }));
+    
+    updateTable();
+});
+
+function applyFilters() {
+    const nome = document.getElementById('nome').value.toLowerCase();
+    const cargo = document.getElementById('cargo').value;
+    const area = document.getElementById('area').value;
+    const gemasRange = document.getElementById('gemas').value;
+    
+    filteredUsers = Array.from(document.querySelectorAll('#usersTable tr')).filter(row => {
+        const userName = row.cells[0].textContent.toLowerCase();
+        const userCargo = row.cells[1].textContent;
+        const userAreas = row.cells[3].textContent;
+        const userGemas = parseInt(row.cells[4].textContent) || 0;
+        
+        // Filtro por nome
+        if (nome && !userName.includes(nome)) return false;
+        
+        // Filtro por cargo
+        if (cargo && !userCargo.includes(cargo)) return false;
+        
+        // Filtro por área
+        if (area && !userAreas.includes(area)) return false;
+        
+        // Filtro por gemas
+        if (gemasRange) {
+            const [min, max] = gemasRange.split('-').map(n => n === '+' ? Infinity : parseInt(n));
+            if (userGemas < min || (max !== Infinity && userGemas > max)) return false;
+        }
+        
+        return true;
+    }).map(row => ({
+        element: row,
+        nome: row.cells[0].textContent,
+        cargo: row.cells[1].textContent,
+        cargo_gema: row.cells[2].textContent,
+        areas: row.cells[3].textContent,
+        gemas: parseInt(row.cells[4].textContent) || 0
+    }));
+    
+    currentPage = 1;
+    updateTable();
+}
+
+function sortTable(field) {
+    if (currentSort.field === field) {
+        currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+    } else {
+        currentSort.field = field;
+        currentSort.direction = 'asc';
+    }
+    
+    // Atualiza ícones de ordenação
+    document.querySelectorAll('.sort-icon').forEach(icon => {
+        icon.classList.remove('active');
+    });
+    const icon = document.querySelector(`th[onclick="sortTable('${field}')"] .sort-icon`);
+    icon.classList.add('active');
+    icon.className = `fas fa-sort-${currentSort.direction === 'asc' ? 'up' : 'down'} sort-icon active`;
+    
+    // Ordena os usuários
+    filteredUsers.sort((a, b) => {
+        let valueA = a[field];
+        let valueB = b[field];
+        
+        if (field === 'gemas') {
+            valueA = parseInt(valueA) || 0;
+            valueB = parseInt(valueB) || 0;
+        }
+        
+        if (valueA < valueB) return currentSort.direction === 'asc' ? -1 : 1;
+        if (valueA > valueB) return currentSort.direction === 'asc' ? 1 : -1;
+        return 0;
+    });
+    
+    updateTable();
+}
+
+function updateTable() {
+    const tbody = document.getElementById('usersTable');
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    
+    // Limpa a tabela
+    tbody.innerHTML = '';
+    
+    // Adiciona os usuários filtrados e ordenados
+    filteredUsers.slice(startIndex, endIndex).forEach(user => {
+        tbody.appendChild(user.element);
+    });
+    
+    updatePagination();
+}
+
+function updatePagination() {
+    const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
+    const pagination = document.getElementById('pagination');
+    pagination.innerHTML = '';
+    
+    // Botão anterior
+    if (totalPages > 1) {
+        const prevButton = document.createElement('button');
+        prevButton.innerHTML = '<i class="fas fa-chevron-left"></i>';
+        prevButton.disabled = currentPage === 1;
+        prevButton.onclick = () => {
+            if (currentPage > 1) {
+                currentPage--;
+                updateTable();
+            }
+        };
+        pagination.appendChild(prevButton);
+    }
+    
+    // Páginas
+    for (let i = 1; i <= totalPages; i++) {
+        const button = document.createElement('button');
+        button.textContent = i;
+        button.classList.toggle('active', i === currentPage);
+        button.onclick = () => {
+            currentPage = i;
+            updateTable();
+        };
+        pagination.appendChild(button);
+    }
+    
+    // Botão próximo
+    if (totalPages > 1) {
+        const nextButton = document.createElement('button');
+        nextButton.innerHTML = '<i class="fas fa-chevron-right"></i>';
+        nextButton.disabled = currentPage === totalPages;
+        nextButton.onclick = () => {
+            if (currentPage < totalPages) {
+                currentPage++;
+                updateTable();
+            }
+        };
+        pagination.appendChild(nextButton);
+    }
+}
+
+function editarGemas(userId, userName, totalGemas) {
+    document.getElementById('userId').value = userId;
+    document.getElementById('userName').textContent = userName;
+    document.getElementById('currentGemas').textContent = totalGemas;
+    document.getElementById('quantidade').value = '';
+    document.getElementById('editGemasModal').style.display = 'block';
+}
+
+function closeModal() {
+    document.getElementById('editGemasModal').style.display = 'none';
+}
+
+function salvarGemas(event) {
+    event.preventDefault();
+    
+    const userId = document.getElementById('userId').value;
+    const quantidade = document.getElementById('quantidade').value;
+    const operation = document.querySelector('input[name="operation"]:checked').value;
+    
+    const url = operation === 'add' ? 
+        `/admin/user/${userId}/add_gemas` : 
+        `/admin/user/${userId}/remove_gemas`;
+    
+    fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: `quantidade=${quantidade}`
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        } else {
+            alert(data.message || 'Erro ao atualizar gemas');
+        }
+    })
+    .catch(error => {
+        console.error('Erro:', error);
+        alert('Erro ao atualizar gemas');
+    });
+    
+    return false;
+}
+
+// Fecha o modal se clicar fora dele
+window.onclick = function(event) {
+    const modal = document.getElementById('editGemasModal');
+    if (event.target == modal) {
+        closeModal();
+    }
+}
+</script>
+{% endblock %} 

@@ -1,0 +1,297 @@
+{% extends "base.html" %}
+
+{% block title %}RED HOT - Aprovar Usuários{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-header {
+        background: linear-gradient(45deg, var(--primary-color), #e74c3c);
+        color: white;
+        padding: 2rem;
+        border-radius: 15px;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .page-header h1 {
+        margin: 0;
+        font-size: 2rem;
+    }
+
+    .page-header .btn-back {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.3s ease;
+    }
+
+    .page-header .btn-back:hover {
+        background: rgba(255, 255, 255, 0.3);
+        transform: translateX(-5px);
+    }
+
+    .users-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .user-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        overflow: hidden;
+    }
+
+    .user-header {
+        background: var(--primary-color);
+        color: white;
+        padding: 1.5rem;
+        font-size: 1.2rem;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .user-header i {
+        font-size: 1.5rem;
+    }
+
+    .user-body {
+        padding: 1.5rem;
+    }
+
+    .user-info {
+        margin-bottom: 1.5rem;
+    }
+
+    .info-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 0.5rem;
+        color: var(--dark-color);
+    }
+
+    .info-item i {
+        color: var(--secondary-color);
+        width: 20px;
+        text-align: center;
+    }
+
+    .user-actions {
+        display: flex;
+        gap: 1rem;
+    }
+
+    .btn-action {
+        flex: 1;
+        padding: 0.75rem;
+        border: none;
+        border-radius: 8px;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+    .btn-aprovar {
+        background: #28a745;
+        color: white;
+    }
+
+    .btn-aprovar:hover {
+        background: #218838;
+        transform: translateY(-2px);
+    }
+
+    .btn-rejeitar {
+        background: var(--primary-color);
+        color: white;
+    }
+
+    .btn-rejeitar:hover {
+        background: #c82333;
+        transform: translateY(-2px);
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 3rem;
+        color: var(--secondary-color);
+    }
+
+    .empty-state i {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+    }
+
+    .empty-state p {
+        font-size: 1.2rem;
+        margin: 0;
+    }
+
+    .loading-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(255, 255, 255, 0.8);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+        visibility: hidden;
+        opacity: 0;
+        transition: all 0.3s ease;
+    }
+
+    .loading-overlay.active {
+        visibility: visible;
+        opacity: 1;
+    }
+
+    .loading-spinner {
+        width: 50px;
+        height: 50px;
+        border: 5px solid #f3f3f3;
+        border-top: 5px solid var(--primary-color);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Aprovar Usuários</h1>
+    <a href="{{ url_for('admin_dashboard') }}" class="btn-back">
+        <i class="fas fa-arrow-left"></i>
+        Voltar
+    </a>
+</div>
+
+{% if users %}
+<div class="users-grid">
+    {% for user in users %}
+    <div class="user-card">
+        <div class="user-header">
+            <i class="fas fa-user-clock"></i>
+            {{ user.username }}
+        </div>
+        <div class="user-body">
+            <div class="user-info">
+                <div class="info-item">
+                    <i class="fas fa-calendar"></i>
+                    Registrado em: {{ user.created_at.strftime('%d/%m/%Y %H:%M') }}
+                </div>
+                <div class="info-item">
+                    <i class="fas fa-clock"></i>
+                    Status: {{ user.status }}
+                </div>
+            </div>
+            <div class="user-actions">
+                <button class="btn-action btn-aprovar" onclick="aprovarUsuario({{ user.id }})">
+                    <i class="fas fa-check"></i>
+                    Aprovar
+                </button>
+                <button class="btn-action btn-rejeitar" onclick="rejeitarUsuario({{ user.id }})">
+                    <i class="fas fa-times"></i>
+                    Rejeitar
+                </button>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+    <i class="fas fa-users-slash"></i>
+    <p>Não há usuários pendentes de aprovação</p>
+</div>
+{% endif %}
+
+<div id="loadingOverlay" class="loading-overlay">
+    <div class="loading-spinner"></div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function showLoading() {
+    document.getElementById('loadingOverlay').classList.add('active');
+}
+
+function hideLoading() {
+    document.getElementById('loadingOverlay').classList.remove('active');
+}
+
+async function aprovarUsuario(id) {
+    if (!confirm('Deseja aprovar este usuário?')) return;
+    
+    showLoading();
+    
+    try {
+        const response = await fetch(`/admin/usuarios/aprovar/${id}`, {
+            method: 'POST'
+        });
+
+        const data = await response.json();
+        
+        if (response.ok) {
+            location.reload();
+        } else {
+            alert(data.error || 'Erro ao aprovar usuário');
+        }
+    } catch (error) {
+        alert('Erro ao processar a requisição');
+        console.error(error);
+    } finally {
+        hideLoading();
+    }
+}
+
+async function rejeitarUsuario(id) {
+    if (!confirm('Deseja rejeitar este usuário?')) return;
+    
+    showLoading();
+    
+    try {
+        const response = await fetch(`/admin/usuarios/rejeitar/${id}`, {
+            method: 'POST'
+        });
+
+        const data = await response.json();
+        
+        if (response.ok) {
+            location.reload();
+        } else {
+            alert(data.error || 'Erro ao rejeitar usuário');
+        }
+    } catch (error) {
+        alert('Erro ao processar a requisição');
+        console.error(error);
+    } finally {
+        hideLoading();
+    }
+}
+</script>
+{% endblock %} 

@@ -1,0 +1,358 @@
+{% extends "base.html" %}
+
+{% block title %}RED HOT - Vídeos +18{% endblock %}
+
+{% block content %}
+<div class="videos-container">
+    <h1 class="area-title">Vídeos +18</h1>
+
+    <div class="videos-grid">
+        {% if posts %}
+            {% for post in posts %}
+            {% set video_url = post.descricao.split('Vídeo: ')[1].split('\n')[0] if 'Vídeo: ' in post.descricao else '' %}
+            <div class="video-card" onclick="showVideoModal('{{ post.titulo }}', '{{ post.descricao|replace('\n', '<br>')|safe }}', '{{ video_url }}', '{{ post.autor.username }}', '{{ post.created_at.strftime('%d/%m/%Y') }}')">
+                <div class="video-thumbnail">
+                    {% if post.foto %}
+                    <img src="{{ post.foto }}" alt="Thumbnail">
+                    <div class="play-overlay">
+                        <i class="fas fa-play"></i>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="video-info">
+                    <h3 class="video-title">{{ post.titulo }}</h3>
+                    <p class="video-description">{{ post.descricao.split('Vídeo:')[0] }}</p>
+                    <div class="video-meta">
+                        <span><i class="fas fa-user"></i> {{ post.autor.username }}</span>
+                        <span><i class="fas fa-calendar"></i> {{ post.created_at.strftime('%d/%m/%Y') }}</span>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="no-videos">
+                <p>Nenhum vídeo disponível</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Modal para exibição do vídeo -->
+<div id="videoModal" class="video-modal">
+    <div class="video-modal-content">
+        <span class="video-modal-close">&times;</span>
+        <h2 id="modalTitle" class="modal-title"></h2>
+        <div class="modal-video-container">
+            <video id="modalVideo" controls controlsList="nodownload">
+                <source src="" type="video/mp4">
+                Seu navegador não suporta vídeos HTML5.
+            </video>
+        </div>
+        <div class="modal-description" id="modalDescription"></div>
+        <div class="modal-meta">
+            <span id="modalAuthor"></span>
+            <span id="modalDate"></span>
+        </div>
+    </div>
+</div>
+
+<script>
+function showVideoModal(title, description, videoUrl, author, date) {
+    const modal = document.getElementById('videoModal');
+    const video = document.getElementById('modalVideo');
+    const videoSource = video.querySelector('source');
+    
+    document.getElementById('modalTitle').textContent = title;
+    document.getElementById('modalDescription').innerHTML = description.split('Vídeo:')[0];
+    document.getElementById('modalAuthor').innerHTML = `<i class="fas fa-user"></i> ${author}`;
+    document.getElementById('modalDate').innerHTML = `<i class="fas fa-calendar"></i> ${date}`;
+    
+    // Atualiza a fonte do vídeo
+    videoSource.src = videoUrl;
+    video.load(); // Recarrega o vídeo com a nova fonte
+    
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+    
+    // Tenta iniciar o vídeo automaticamente
+    video.play().catch(function(error) {
+        console.log("Reprodução automática não permitida:", error);
+    });
+}
+
+// Fechar modal ao clicar no X
+document.querySelector('.video-modal-close').onclick = function() {
+    const modal = document.getElementById('videoModal');
+    const video = document.getElementById('modalVideo');
+    video.pause();
+    modal.style.display = 'none';
+    document.body.style.overflow = 'auto';
+}
+
+// Fechar modal ao clicar fora do conteúdo
+window.onclick = function(event) {
+    const modal = document.getElementById('videoModal');
+    if (event.target == modal) {
+        const video = document.getElementById('modalVideo');
+        video.pause();
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }
+}
+
+// Fechar modal com ESC
+document.addEventListener('keydown', function(event) {
+    if (event.key === "Escape") {
+        const modal = document.getElementById('videoModal');
+        const video = document.getElementById('modalVideo');
+        video.pause();
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }
+});
+</script>
+{% endblock %}
+
+{% block extra_styles %}
+<style>
+    .videos-container {
+        max-width: 1200px;
+        width: 95%;
+        margin: 80px auto 40px;
+        min-height: calc(100vh - 200px);
+    }
+
+    .area-title {
+        color: #ff0000;
+        text-align: center;
+        font-size: 2em;
+        margin-bottom: 40px;
+        font-weight: 300;
+    }
+
+    .videos-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 20px;
+    }
+
+    .video-card {
+        background: #1a1a1a;
+        border-radius: 8px;
+        overflow: hidden;
+        cursor: pointer;
+        transition: transform 0.2s;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .video-card:hover {
+        transform: translateY(-2px);
+    }
+
+    .video-thumbnail {
+        position: relative;
+        width: 100%;
+        height: 180px;
+        overflow: hidden;
+        background: #000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .video-thumbnail img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+
+    .play-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.3);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 1;
+        transition: opacity 0.2s;
+    }
+
+    .play-overlay i {
+        color: #fff;
+        font-size: 3em;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        opacity: 0.9;
+    }
+
+    .video-card:hover .play-overlay {
+        background: rgba(0, 0, 0, 0.5);
+    }
+
+    .video-card:hover .play-overlay i {
+        opacity: 1;
+        transform: scale(1.1);
+        transition: all 0.2s ease;
+    }
+
+    .video-info {
+        padding: 15px;
+    }
+
+    .video-title {
+        color: #fff;
+        font-size: 1.1em;
+        margin: 0 0 10px 0;
+        overflow: hidden;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+    }
+
+    .video-description {
+        color: #bbb;
+        font-size: 0.9em;
+        margin: 0 0 15px 0;
+        overflow: hidden;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        line-height: 1.5;
+    }
+
+    .video-meta {
+        display: flex;
+        justify-content: space-between;
+        color: #666;
+        font-size: 0.85em;
+        padding-top: 10px;
+        border-top: 1px solid #222;
+    }
+
+    .no-videos {
+        grid-column: 1 / -1;
+        text-align: center;
+        padding: 40px;
+        background: #1a1a1a;
+        border-radius: 8px;
+        color: #666;
+    }
+
+    /* Modal de Vídeo */
+    .video-modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.95);
+        overflow-y: auto;
+        justify-content: center;
+        align-items: flex-start;
+    }
+
+    .video-modal-content {
+        position: relative;
+        width: 95%;
+        max-width: 1200px;
+        margin: 20px auto;
+        background: #1a1a1a;
+        border-radius: 8px;
+        padding: 20px;
+    }
+
+    .video-modal-close {
+        position: absolute;
+        top: 15px;
+        right: 20px;
+        color: #fff;
+        font-size: 30px;
+        cursor: pointer;
+        z-index: 1001;
+    }
+
+    .modal-title {
+        color: #fff;
+        font-size: 1.5em;
+        margin: 0 0 20px 0;
+        padding-right: 30px;
+    }
+
+    .modal-video-container {
+        width: 100%;
+        background: #000;
+        margin-bottom: 20px;
+        border-radius: 4px;
+        overflow: hidden;
+        position: relative;
+        padding-top: 56.25%; /* 16:9 Aspect Ratio */
+    }
+
+    .modal-video-container video {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+    }
+
+    .modal-description {
+        color: #fff;
+        font-size: 1em;
+        line-height: 1.6;
+        margin: 20px 0;
+        white-space: pre-line;
+        text-align: justify;
+    }
+
+    .modal-meta {
+        display: flex;
+        justify-content: space-between;
+        color: #666;
+        font-size: 0.9em;
+        padding-top: 15px;
+        border-top: 1px solid #333;
+    }
+
+    @media (max-width: 768px) {
+        .videos-container {
+            margin: 60px auto 20px;
+        }
+
+        .area-title {
+            font-size: 1.5em;
+            margin-bottom: 30px;
+        }
+
+        .videos-grid {
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+
+        .video-modal-content {
+            width: 100%;
+            margin: 0;
+            min-height: 100vh;
+            border-radius: 0;
+        }
+
+        .modal-video-container {
+            padding-top: 75%; /* 4:3 Aspect Ratio para mobile */
+        }
+
+        .modal-title {
+            font-size: 1.2em;
+        }
+
+        .modal-description {
+            font-size: 0.95em;
+        }
+    }
+</style>
+{% endblock %} 

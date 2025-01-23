@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RED HOT - Página Principal</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #ff0000;
+            --primary-hover: #cc0000;
+            --bg-dark: #0a0a0a;
+            --bg-darker: #151515;
+            --bg-light: #222;
+            --text-color: #fff;
+            --text-muted: #666;
+            --border-color: #333;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-color);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Menu Superior Flutuante */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background-color: var(--bg-darker);
+            padding: 15px 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            border-bottom: 2px solid var(--primary-color);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+
+        .nav-logo {
+            color: var(--primary-color);
+            font-size: 24px;
+            font-weight: bold;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .nav-menu li {
+            position: relative;
+        }
+
+        .nav-menu a {
+            color: var(--text-color);
+            text-decoration: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-menu a:hover {
+            background-color: var(--bg-light);
+            color: var(--primary-color);
+        }
+
+        .areas-dropdown {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background-color: var(--bg-darker);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            min-width: 200px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+        }
+
+        .nav-menu li:hover .areas-dropdown {
+            display: block;
+        }
+
+        .areas-dropdown a {
+            display: block;
+            padding: 10px 15px;
+            color: var(--text-color);
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .areas-dropdown a:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        /* Conteúdo Principal */
+        .main-content {
+            margin-top: 80px;
+            flex: 1;
+            padding: 20px;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+            width: 100%;
+        }
+
+        /* Seção de Boas-vindas */
+        .welcome-section {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 0;
+            background: var(--bg-darker);
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+
+        .welcome-image {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+            display: block;
+        }
+
+        /* Seção de Destaques */
+        .destaques-section {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .destaque-card {
+            background: var(--bg-darker);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease;
+        }
+
+        .destaque-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .destaque-header {
+            background: var(--primary-color);
+            color: white;
+            padding: 1.5rem;
+            font-size: 1.2rem;
+            text-align: center;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .destaque-content {
+            padding: 2rem;
+        }
+
+        .destaque-img {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+        }
+
+        /* Grid de Conteúdo */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+        }
+
+        .noticias-section, .avisos-section {
+            background: var(--bg-darker);
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--primary-color);
+        }
+
+        .section-header i {
+            color: var(--primary-color);
+            font-size: 1.5rem;
+            margin-right: 1rem;
+        }
+
+        .section-header h2 {
+            color: var(--text-color);
+            font-size: 1.8rem;
+            margin: 0;
+        }
+
+        .news-grid {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .news-card {
+            background: var(--bg-dark);
+            border-radius: 10px;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+            cursor: pointer;
+        }
+
+        .news-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .news-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .news-content {
+            padding: 1.5rem;
+        }
+
+        .news-title {
+            color: var(--primary-color);
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            font-weight: bold;
+        }
+
+        .news-description {
+            color: var(--text-color);
+            font-size: 0.95rem;
+            line-height: 1.6;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .news-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-color);
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        /* Rodapé */
+        .footer {
+            background-color: var(--bg-darker);
+            color: var(--text-color);
+            padding: 4rem 0 2rem;
+            margin-top: 4rem;
+            border-top: 2px solid var(--primary-color);
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 3rem;
+            padding: 0 20px;
+        }
+
+        .footer-section h3 {
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .footer-section p {
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+        }
+
+        .footer-section ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .footer-section ul li {
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-section ul a {
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-section ul a:hover {
+            color: var(--primary-color);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 2rem;
+            margin-top: 2rem;
+            border-top: 1px solid var(--border-color);
+            color: var(--text-muted);
+        }
+
+        /* Modal */
+        .news-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 1000;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        .modal-content {
+            background: var(--bg-darker);
+            max-width: 800px;
+            margin: 2rem auto;
+            border-radius: 15px;
+            padding: 2rem;
+            position: relative;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            color: var(--text-color);
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .modal-close:hover {
+            color: var(--primary-color);
+        }
+
+        .modal-image {
+            width: 100%;
+            max-height: 400px;
+            object-fit: cover;
+            border-radius: 10px;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-title {
+            color: var(--primary-color);
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+        }
+
+        .modal-description {
+            color: var(--text-color);
+            font-size: 1.1rem;
+            line-height: 1.8;
+            white-space: pre-wrap;
+        }
+
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .nav-menu {
+                display: none;
+                position: absolute;
+                top: 60px;
+                left: 0;
+                right: 0;
+                background-color: var(--bg-darker);
+                flex-direction: column;
+                padding: 1rem;
+            }
+
+            .nav-menu.active {
+                display: flex;
+            }
+
+            .menu-toggle {
+                display: block;
+                font-size: 24px;
+                color: var(--text-color);
+                cursor: pointer;
+            }
+
+            .destaques-section,
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-content {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .welcome-section h1 {
+                font-size: 2rem;
+            }
+
+            .section-header h2 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Menu Superior Flutuante -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="{{ url_for('home') }}" class="nav-logo">
+                <i class="fas fa-fire"></i>
+                RED HOT
+            </a>
+            <ul class="nav-menu">
+                <li><a href="{{ url_for('home') }}"><i class="fas fa-home"></i> Página Principal</a></li>
+                <li>
+                    <a href="#areas"><i class="fas fa-users-cog"></i> Áreas da Staff</a>
+                    <div class="areas-dropdown">
+                        {% for area in areas %}
+                            {% if area.nome != 'Area +18' %}
+                                <a href="{{ url_for('area_posts', area_id=area.id) }}">{{ area.nome }}</a>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </li>
+                <li><a href="{{ url_for('age_verification') }}"><i class="fas fa-exclamation-circle"></i> Área +18</a></li>
+                {% if 'username' not in session %}
+                <li><a href="{{ url_for('login') }}"><i class="fas fa-sign-in-alt"></i> Login</a></li>
+                <li><a href="{{ url_for('register') }}"><i class="fas fa-user-plus"></i> Cadastro</a></li>
+                {% else %}
+                <li><a href="{{ url_for('dashboard') }}"><i class="fas fa-tachometer-alt"></i> Painel</a></li>
+                <li><a href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i> Sair</a></li>
+                {% endif %}
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Conteúdo Principal -->
+    <div class="main-content">
+        <!-- Seção de Boas-vindas -->
+        <div class="welcome-section">
+            <img src="{{ url_for('static', filename='images/banner_image.png') }}" alt="Banner RED HOT" class="welcome-image">
+        </div>
+
+        <!-- Seção de Destaques -->
+        <div class="destaques-section">
+            <!-- Destaque da Semana -->
+            <div class="destaque-card">
+                <div class="destaque-header">
+                    <i class="fas fa-star"></i> Destaque da Semana
+                </div>
+                <div class="destaque-content">
+                    {% if destaque_semana %}
+                    <h3>{{ destaque_semana.user.username }}</h3>
+                    {% if destaque_semana.foto %}
+                    <img src="{{ destaque_semana.foto }}" alt="Destaque da Semana" class="destaque-img">
+                    {% endif %}
+                    <div class="news-meta">
+                        <span><i class="far fa-calendar"></i> {{ destaque_semana.created_at.strftime('%d/%m/%Y') }}</span>
+                    </div>
+                    {% else %}
+                    <p>Nenhum destaque da semana definido.</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Destaque do Mês -->
+            <div class="destaque-card">
+                <div class="destaque-header">
+                    <i class="fas fa-crown"></i> Destaque do Mês
+                </div>
+                <div class="destaque-content">
+                    {% if destaque_mes %}
+                    <h3>{{ destaque_mes.user.username }}</h3>
+                    {% if destaque_mes.foto %}
+                    <img src="{{ destaque_mes.foto }}" alt="Destaque do Mês" class="destaque-img">
+                    {% endif %}
+                    <div class="news-meta">
+                        <span><i class="far fa-calendar"></i> {{ destaque_mes.created_at.strftime('%d/%m/%Y') }}</span>
+                    </div>
+                    {% else %}
+                    <p>Nenhum destaque do mês definido.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Grid de Conteúdo -->
+        <div class="content-grid">
+            <!-- Seção de Notícias -->
+            <div class="noticias-section">
+                <div class="section-header">
+                    <i class="fas fa-newspaper"></i>
+                    <h2>Últimas Notícias</h2>
+                </div>
+                <div class="news-grid">
+                    {% for noticia in noticias %}
+                    <div class="news-card" onclick="showNewsModal('{{ noticia.titulo }}', '{{ noticia.descricao }}', '{{ noticia.foto if noticia.foto else '' }}', '{{ noticia.created_at.strftime('%d/%m/%Y %H:%M') }}')">
+                        {% if noticia.foto %}
+                        <img src="{{ noticia.foto }}" alt="{{ noticia.titulo }}" class="news-image">
+                        {% endif %}
+                        <div class="news-content">
+                            <div class="news-title">{{ noticia.titulo }}</div>
+                            <div class="news-description">{{ noticia.descricao }}</div>
+                            <div class="news-meta">
+                                <span><i class="far fa-clock"></i> {{ noticia.created_at.strftime('%d/%m/%Y %H:%M') }}</span>
+                                {% if noticia.autor %}
+                                <span><i class="far fa-user"></i> {{ noticia.autor.username }}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Seção de Avisos -->
+            <div class="avisos-section">
+                <div class="section-header">
+                    <i class="fas fa-bullhorn"></i>
+                    <h2>Avisos</h2>
+                </div>
+                <div class="news-grid">
+                    {% for aviso in avisos %}
+                    <div class="news-card" onclick="showNewsModal('{{ aviso.titulo }}', '{{ aviso.descricao }}', '{{ aviso.foto if aviso.foto else '' }}', '{{ aviso.created_at.strftime('%d/%m/%Y %H:%M') }}')">
+                        <div class="news-content">
+                            <div class="news-title">{{ aviso.titulo }}</div>
+                            <div class="news-description">{{ aviso.descricao }}</div>
+                            <div class="news-meta">
+                                <span><i class="far fa-clock"></i> {{ aviso.created_at.strftime('%d/%m/%Y %H:%M') }}</span>
+                                {% if aviso.autor %}
+                                <span><i class="far fa-user"></i> {{ aviso.autor.username }}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Notícias -->
+    <div class="news-modal" id="newsModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeNewsModal()">
+                <i class="fas fa-times"></i>
+            </button>
+            <img src="" alt="" class="modal-image" id="modalImage" style="display: none;">
+            <h2 class="modal-title" id="modalTitle"></h2>
+            <div class="modal-description" id="modalDescription"></div>
+        </div>
+    </div>
+
+    <!-- Rodapé -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>Sobre</h3>
+                <p>RED HOT - Sistema de gerenciamento de staff e conteúdo.</p>
+            </div>
+            <div class="footer-section">
+                <h3>Contato</h3>
+                <p>Email: redhotsistemas@gmail.com</p>
+                <p>Discord: redhot0101</p>
+            </div>
+            <div class="footer-section">
+                <h3>Links Úteis</h3>
+                <ul>
+                    <li><a href="{{ url_for('home') }}">Página Inicial</a></li>
+                    <li><a href="{{ url_for('login') }}">Login</a></li>
+                    <li><a href="{{ url_for('register') }}">Registro</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 RED HOT. Todos os direitos reservados.</p>
+        </div>
+    </footer>
+
+    <script>
+    function showNewsModal(title, description, image, date) {
+        const modal = document.getElementById('newsModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalDescription = document.getElementById('modalDescription');
+        const modalImage = document.getElementById('modalImage');
+
+        modalTitle.textContent = title;
+        modalDescription.textContent = description;
+
+        if (image && image !== 'None') {
+            modalImage.src = image;
+            modalImage.style.display = 'block';
+        } else {
+            modalImage.style.display = 'none';
+        }
+
+        modal.style.display = 'block';
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeNewsModal() {
+        const modal = document.getElementById('newsModal');
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }
+
+    // Fechar modal ao clicar fora
+    window.onclick = function(event) {
+        const modal = document.getElementById('newsModal');
+        if (event.target == modal) {
+            closeNewsModal();
+        }
+    }
+
+    // Fechar modal com tecla ESC
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape') {
+            closeNewsModal();
+        }
+    });
+
+    // Menu mobile
+    const menuToggle = document.querySelector('.menu-toggle');
+    const navMenu = document.querySelector('.nav-menu');
+    if (menuToggle) {
+        menuToggle.addEventListener('click', () => {
+            navMenu.classList.toggle('active');
+        });
+    }
+    </script>
+</body>
+</html> 

@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+
+{% block title %}RED HOT - Verificação de Idade{% endblock %}
+
+{% block content %}
+<div class="age-verification-container">
+    <div class="warning-box">
+        <h1>⚠️ Conteúdo +18</h1>
+        <div class="warning-content">
+            <p>Ao prosseguir, você confirma que é maior de 18 anos e está ciente do conteúdo adulto.</p>
+        </div>
+        <div class="actions">
+            <form method="POST" action="{{ url_for('age_verification') }}">
+                <button type="submit" class="btn-confirm">Confirmar idade</button>
+            </form>
+            <a href="{{ url_for('home') }}" class="btn-back">Voltar</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_styles %}
+<style>
+    .age-verification-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: #0f0f0f;
+        padding: 20px;
+    }
+
+    .warning-box {
+        background-color: rgba(26, 26, 26, 0.95);
+        border: 1px solid #ff0000;
+        border-radius: 4px;
+        padding: 40px;
+        max-width: 500px;
+        width: 90%;
+        text-align: center;
+        margin: auto;
+    }
+
+    .warning-box h1 {
+        color: #ff0000;
+        font-size: 1.6em;
+        margin-bottom: 25px;
+        font-weight: normal;
+    }
+
+    .warning-content {
+        margin: 25px 0;
+    }
+
+    .warning-content p {
+        color: #fff;
+        font-size: 1em;
+        line-height: 1.5;
+        margin: 0;
+    }
+
+    .actions {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        align-items: center;
+    }
+
+    .btn-confirm {
+        background-color: #ff0000;
+        color: #fff;
+        border: none;
+        padding: 12px 30px;
+        border-radius: 4px;
+        font-size: 0.95em;
+        cursor: pointer;
+        transition: all 0.2s;
+        width: 100%;
+    }
+
+    .btn-confirm:hover {
+        background-color: #cc0000;
+        transform: translateY(-2px);
+    }
+
+    .btn-back {
+        color: #666;
+        text-decoration: none;
+        font-size: 0.9em;
+        transition: color 0.2s;
+    }
+
+    .btn-back:hover {
+        color: #999;
+    }
+
+    @media (max-width: 768px) {
+        .warning-box {
+            padding: 30px 20px;
+        }
+    }
+</style>
+{% endblock %} 

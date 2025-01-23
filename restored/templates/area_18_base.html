@@ -1,0 +1,182 @@
+{% extends "admin_base.html" %}
+
+{% block title %}RED HOT - {% block section_title %}{% endblock %}{% endblock %}
+
+{% block header_title %}
+<div class="admin-header">
+    <div class="header-content">
+        <h1>{% block section_header %}{% endblock %}</h1>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_styles %}
+<style>
+    .area-18-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    .warning-banner {
+        background: rgba(255, 0, 0, 0.1);
+        border: 1px solid #ff0000;
+        color: #ff0000;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        text-align: center;
+        font-weight: bold;
+    }
+
+    .btn-container {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 30px;
+        gap: 15px;
+    }
+
+    .btn-back {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 20px;
+        background: #333;
+        color: white;
+        text-decoration: none;
+        border-radius: 4px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-back:hover {
+        background: #444;
+        transform: translateY(-2px);
+        text-decoration: none;
+        color: white;
+    }
+
+    .posts-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+    }
+
+    .post-card {
+        background: #151515;
+        border: 1px solid #222;
+        border-radius: 8px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .post-card:hover {
+        transform: translateY(-5px);
+        border-color: #ff0000;
+        box-shadow: 0 5px 15px rgba(255, 0, 0, 0.1);
+    }
+
+    .post-header {
+        padding: 15px;
+        border-bottom: 1px solid #222;
+    }
+
+    .post-title {
+        color: #fff;
+        margin: 0;
+        font-size: 1.2em;
+    }
+
+    .post-image {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+    }
+
+    .post-content {
+        padding: 15px;
+    }
+
+    .post-description {
+        color: #ccc;
+        margin-bottom: 15px;
+        line-height: 1.5;
+    }
+
+    .post-meta {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        color: #666;
+        font-size: 0.9em;
+        border-top: 1px solid #222;
+        padding-top: 15px;
+    }
+
+    .post-author {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .post-date {
+        font-style: italic;
+    }
+
+    .empty-message {
+        text-align: center;
+        padding: 40px;
+        color: #666;
+        background: #151515;
+        border: 1px solid #222;
+        border-radius: 8px;
+        font-style: italic;
+    }
+
+    {% block section_styles %}{% endblock %}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="area-18-container">
+    <div class="warning-banner">
+        ⚠️ Área restrita para maiores de 18 anos. Todo o conteúdo aqui é sensível e explícito.
+    </div>
+
+    <div class="btn-container">
+        <a href="{{ url_for('area_18') }}" class="btn-back">
+            <i class="fas fa-arrow-left"></i> Voltar para Área +18
+        </a>
+    </div>
+
+    {% if posts %}
+    <div class="posts-grid">
+        {% for post in posts %}
+        <div class="post-card">
+            <div class="post-header">
+                <h3 class="post-title">{{ post.titulo }}</h3>
+            </div>
+            {% if post.foto %}
+            <img src="{{ post.foto }}" alt="{{ post.titulo }}" class="post-image">
+            {% endif %}
+            <div class="post-content">
+                <div class="post-description">{{ post.descricao|safe }}</div>
+                <div class="post-meta">
+                    <div class="post-author">
+                        <i class="fas fa-user"></i>
+                        {{ post.autor.username }}
+                    </div>
+                    <div class="post-date">
+                        {{ post.created_at.strftime('%d/%m/%Y %H:%M') }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-message">
+        Nenhum post disponível nesta seção.
+    </div>
+    {% endif %}
+</div>
+{% endblock %} 

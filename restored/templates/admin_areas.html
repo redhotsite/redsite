@@ -1,0 +1,302 @@
+{% extends "admin_base.html" %}
+
+{% block title %}RED HOT - Gerenciamento de Áreas{% endblock %}
+
+{% block header_title %}
+<div style="display: flex; justify-content: space-between; align-items: center;">
+    <div style="display: flex; align-items: center; gap: 20px;">
+        <a href="{{ url_for('admin_dashboard') }}" class="btn-area">
+            <i class="fas fa-arrow-left"></i> Voltar ao Painel
+        </a>
+        <span>Gerenciar Áreas</span>
+    </div>
+    {% if user.cargo.nivel <= 2 %}
+    <button onclick="toggleAddForm()" class="btn-area" style="margin-left: auto;">
+        <i class="fas fa-plus"></i> Nova Área
+    </button>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_styles %}
+<style>
+    .admin-container {
+        padding: 20px;
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+    .areas-container {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 20px;
+        margin-top: 20px;
+    }
+
+    .area-card {
+        background-color: #151515;
+        border: 1px solid #222;
+        border-radius: 8px;
+        padding: 20px;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+    .area-card:hover {
+        transform: translateY(-2px);
+        border-color: #ff0000;
+        box-shadow: 0 4px 12px rgba(255, 0, 0, 0.1);
+    }
+
+    .area-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 15px;
+    }
+
+    .area-title {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .area-header i {
+        color: #ff0000;
+        font-size: 24px;
+        width: 30px;
+        text-align: center;
+    }
+
+    .area-header span {
+        color: #fff;
+        font-size: 18px;
+        font-weight: 500;
+    }
+
+    .area-stats {
+        color: #888;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .area-stats i {
+        color: #666;
+        font-size: 14px;
+    }
+
+    .area-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 15px;
+    }
+
+    .btn-area {
+        background: transparent;
+        border: 1px solid #333;
+        color: #888;
+        padding: 8px 15px;
+        border-radius: 4px;
+        font-size: 13px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .btn-area:hover {
+        background: #ff0000;
+        border-color: #ff0000;
+        color: #fff;
+    }
+
+    .btn-area i {
+        font-size: 14px;
+    }
+
+    .btn-remove {
+        background: none;
+        border: none;
+        color: #666;
+        cursor: pointer;
+        padding: 4px;
+        font-size: 16px;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .btn-remove:hover {
+        color: #ff0000;
+    }
+
+    .add-area-form {
+        display: none;
+        background: #151515;
+        border: 1px solid #222;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    .form-group label {
+        display: block;
+        color: #fff;
+        margin-bottom: 8px;
+        font-size: 14px;
+    }
+
+    .form-group input {
+        width: 100%;
+        padding: 8px 12px;
+        background: #0a0a0a;
+        border: 1px solid #333;
+        border-radius: 4px;
+        color: #fff;
+        font-size: 14px;
+    }
+
+    .form-group input:focus {
+        border-color: #ff0000;
+        outline: none;
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 10px;
+        justify-content: flex-end;
+        margin-top: 20px;
+    }
+
+    @media (max-width: 1200px) {
+        .areas-container {
+            grid-template-columns: repeat(3, 1fr);
+        }
+    }
+
+    @media (max-width: 900px) {
+        .areas-container {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @media (max-width: 600px) {
+        .areas-container {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="admin-container">
+    {% if user.cargo.nivel <= 2 %}
+    <form action="{{ url_for('add_area') }}" method="POST" class="add-area-form" id="addAreaForm">
+        <div class="form-group">
+            <label for="nome">Nome da Nova Área:</label>
+            <input type="text" id="nome" name="nome" required>
+        </div>
+        <div class="form-actions">
+            <button type="button" class="btn-area" onclick="toggleAddForm()">
+                <i class="fas fa-times"></i> Cancelar
+            </button>
+            <button type="submit" class="btn-area">
+                <i class="fas fa-plus"></i> Adicionar
+            </button>
+        </div>
+    </form>
+    {% endif %}
+
+    <div class="areas-container">
+        {% for area in areas %}
+        <div class="area-card">
+            <div class="area-header">
+                <div class="area-title">
+                    {% if area.nome == 'Area +18' %}
+                        <i class="fas fa-exclamation-circle"></i>
+                    {% elif area.nome == 'Eventos' %}
+                        <i class="fas fa-calendar-alt"></i>
+                    {% elif area.nome == 'Games' %}
+                        <i class="fas fa-gamepad"></i>
+                    {% elif area.nome == 'Marketing' %}
+                        <i class="fas fa-bullhorn"></i>
+                    {% elif area.nome == 'Migração' %}
+                        <i class="fas fa-exchange-alt"></i>
+                    {% elif area.nome == 'Moderação' %}
+                        <i class="fas fa-shield-alt"></i>
+                    {% elif area.nome == 'Monitoramento' %}
+                        <i class="fas fa-desktop"></i>
+                    {% elif area.nome == 'Mov Call' %}
+                        <i class="fas fa-phone-alt"></i>
+                    {% elif area.nome == 'Mov Chat' %}
+                        <i class="fas fa-comments"></i>
+                    {% elif area.nome == 'Mov Sex' %}
+                        <i class="fas fa-heart"></i>
+                    {% elif area.nome == 'Perfil' %}
+                        <i class="fas fa-user"></i>
+                    {% elif area.nome == 'Recrutamento' %}
+                        <i class="fas fa-user-plus"></i>
+                    {% elif area.nome == 'Registro' %}
+                        <i class="fas fa-clipboard-list"></i>
+                    {% elif area.nome == 'Social' %}
+                        <i class="fas fa-share-alt"></i>
+                    {% else %}
+                        <i class="fas fa-folder"></i>
+                    {% endif %}
+                    <span>{{ area.nome }}</span>
+                </div>
+                {% if area.nome != 'Area +18' %}
+                <button onclick="removeArea({{ area.id }}, '{{ user.cargo.nivel }}')" class="btn-remove">
+                    <i class="fas fa-times"></i>
+                </button>
+                {% endif %}
+            </div>
+            <div class="area-stats">
+                <i class="fas fa-users"></i>
+                <span>{{ area.users|length }} membros</span>
+            </div>
+            <div class="area-actions">
+                <a href="{{ url_for('admin_area_members', area_id=area.id) }}" class="btn-area">
+                    <i class="fas fa-users"></i> Membros
+                </a>
+                {% if user.cargo.nivel <= 5 %}
+                <a href="{{ url_for('admin_area_posts', area_id=area.id) }}" class="btn-area">
+                    <i class="fas fa-file-alt"></i> Posts
+                </a>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+function toggleAddForm() {
+    const form = document.getElementById('addAreaForm');
+    form.style.display = form.style.display === 'none' ? 'block' : 'none';
+}
+
+function removeArea(areaId, userLevel) {
+    if (userLevel <= 2) {
+        if (confirm('Tem certeza que deseja remover esta área?')) {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = `/admin/area/${areaId}/remove`;
+            document.body.appendChild(form);
+            form.submit();
+        }
+    } else {
+        alert('Apenas usuários DEV podem remover áreas.');
+    }
+}
+</script>
+{% endblock %} 

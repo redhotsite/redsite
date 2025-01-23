@@ -1,0 +1,352 @@
+{% extends "admin_base.html" %}
+
+{% block title %}RED HOT - Gerenciamento de Cargos por Gemas{% endblock %}
+
+{% block header_title %}
+<div style="display: flex; align-items: center; gap: 20px;">
+    <a href="{{ url_for('admin_dashboard') }}" class="btn-back">
+        <i class="fas fa-arrow-left"></i> Voltar ao Painel
+    </a>
+    <span>Gerenciamento de Cargos por Gemas</span>
+</div>
+{% endblock %}
+
+{% block extra_styles %}
+<style>
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    .section {
+        background: #151515;
+        border: 1px solid #222;
+        border-radius: 8px;
+        padding: 25px;
+        margin-bottom: 30px;
+    }
+
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .section-title {
+        color: #ff0000;
+        margin: 0;
+        font-size: 24px;
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 5px;
+        color: #fff;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 8px;
+        background: #222;
+        border: 1px solid #333;
+        border-radius: 4px;
+        color: #fff;
+    }
+
+    .form-control:focus {
+        border-color: #ff0000;
+        outline: none;
+    }
+
+    .btn {
+        padding: 8px 15px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary {
+        background: #ff0000;
+        color: white;
+    }
+
+    .btn-secondary {
+        background: #333;
+        color: white;
+    }
+
+    .btn:hover {
+        transform: translateY(-2px);
+        opacity: 0.9;
+    }
+
+    .table-container {
+        overflow-x: auto;
+    }
+
+    .table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+
+    .table th,
+    .table td {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 1px solid #222;
+    }
+
+    .table th {
+        background: #222;
+        color: #ff0000;
+        font-weight: 600;
+    }
+
+    .table tbody tr:hover {
+        background: #1a1a1a;
+    }
+
+    .table td {
+        color: #fff;
+    }
+
+    .actions {
+        display: flex;
+        gap: 10px;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 40px;
+        color: #666;
+    }
+
+    .empty-state i {
+        font-size: 48px;
+        margin-bottom: 20px;
+        color: #333;
+    }
+
+    @media (max-width: 768px) {
+        .form-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    {% if user.cargo.nivel <= 2 %}
+    <div class="section">
+        <div class="section-header">
+            <h2 class="section-title">Adicionar Novo Cargo por Gemas</h2>
+        </div>
+        <form id="addCargoForm" onsubmit="return addCargo(event)">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="nome">Nome do Cargo</label>
+                    <input type="text" id="nome" name="nome" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="min_gemas">Mínimo de Gemas</label>
+                    <input type="number" id="min_gemas" name="min_gemas" class="form-control" required min="0">
+                </div>
+                <div class="form-group">
+                    <label for="max_gemas">Máximo de Gemas</label>
+                    <input type="number" id="max_gemas" name="max_gemas" class="form-control" required min="0">
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Adicionar Cargo
+            </button>
+        </form>
+    </div>
+    {% endif %}
+
+    <div class="section">
+        <div class="section-header">
+            <h2 class="section-title">Cargos por Gemas</h2>
+        </div>
+        <div class="table-container">
+            {% if cargos %}
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Mínimo de Gemas</th>
+                        <th>Máximo de Gemas</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for cargo in cargos %}
+                    <tr>
+                        <td>{{ cargo.nome }}</td>
+                        <td>{{ cargo.min_gemas }}</td>
+                        <td>{{ cargo.max_gemas }}</td>
+                        <td class="actions">
+                            {% if user.cargo.nivel <= 2 %}
+                            <button class="btn btn-secondary" onclick="editarCargo({{ cargo.id }}, '{{ cargo.nome }}', {{ cargo.min_gemas }}, {{ cargo.max_gemas }})">
+                                <i class="fas fa-edit"></i> Editar
+                            </button>
+                            <button class="btn btn-primary" onclick="excluirCargo({{ cargo.id }})">
+                                <i class="fas fa-trash"></i> Excluir
+                            </button>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="empty-state">
+                <i class="fas fa-gem"></i>
+                <p>Nenhum cargo por gemas cadastrado.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Edição -->
+<div id="editModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title">Editar Cargo por Gemas</h3>
+            <button class="close-modal" onclick="closeModal()">&times;</button>
+        </div>
+        <form id="editForm" onsubmit="return salvarEdicao(event)">
+            <input type="hidden" id="cargoId" name="cargo_id">
+            <div class="form-group">
+                <label for="edit_nome">Nome do Cargo</label>
+                <input type="text" id="edit_nome" name="nome" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="edit_min_gemas">Mínimo de Gemas</label>
+                <input type="number" id="edit_min_gemas" name="min_gemas" class="form-control" required min="0">
+            </div>
+            <div class="form-group">
+                <label for="edit_max_gemas">Máximo de Gemas</label>
+                <input type="number" id="edit_max_gemas" name="max_gemas" class="form-control" required min="0">
+            </div>
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save"></i> Salvar
+            </button>
+        </form>
+    </div>
+</div>
+
+<script>
+function addCargo(event) {
+    event.preventDefault();
+    
+    const formData = new FormData(event.target);
+    
+    fetch('/admin/cargo_gema/add', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        } else {
+            alert(data.message || 'Erro ao adicionar cargo');
+        }
+    })
+    .catch(error => {
+        console.error('Erro:', error);
+        alert('Erro ao adicionar cargo');
+    });
+    
+    return false;
+}
+
+function editarCargo(id, nome, minGemas, maxGemas) {
+    document.getElementById('cargoId').value = id;
+    document.getElementById('edit_nome').value = nome;
+    document.getElementById('edit_min_gemas').value = minGemas;
+    document.getElementById('edit_max_gemas').value = maxGemas;
+    
+    document.getElementById('editModal').style.display = 'block';
+}
+
+function closeModal() {
+    document.getElementById('editModal').style.display = 'none';
+}
+
+function salvarEdicao(event) {
+    event.preventDefault();
+    
+    const cargoId = document.getElementById('cargoId').value;
+    const formData = new FormData(event.target);
+    
+    fetch(`/admin/cargo_gema/${cargoId}/edit`, {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        } else {
+            alert(data.message || 'Erro ao editar cargo');
+        }
+    })
+    .catch(error => {
+        console.error('Erro:', error);
+        alert('Erro ao editar cargo');
+    });
+    
+    return false;
+}
+
+// Fecha o modal se clicar fora dele
+window.onclick = function(event) {
+    const modal = document.getElementById('editModal');
+    if (event.target == modal) {
+        closeModal();
+    }
+}
+
+function excluirCargo(cargoId) {
+    if (confirm('Tem certeza que deseja excluir este cargo?')) {
+        fetch(`/admin/cargo_gema/${cargoId}/delete`, {
+            method: 'POST'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert(data.message || 'Erro ao excluir cargo');
+            }
+        })
+        .catch(error => {
+            console.error('Erro:', error);
+            alert('Erro ao excluir cargo');
+        });
+    }
+}
+</script>
+{% endblock %} 

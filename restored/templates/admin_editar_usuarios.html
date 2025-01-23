@@ -1,0 +1,377 @@
+{% extends "base.html" %}
+
+{% block title %}RED HOT - Editar Usuários{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-header {
+        background: linear-gradient(45deg, var(--primary-color), #e74c3c);
+        color: white;
+        padding: 2rem;
+        border-radius: 15px;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .page-header h1 {
+        margin: 0;
+        font-size: 2rem;
+    }
+
+    .page-header .btn-back {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.3s ease;
+    }
+
+    .page-header .btn-back:hover {
+        background: rgba(255, 255, 255, 0.3);
+        transform: translateX(-5px);
+    }
+
+    .users-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .user-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        overflow: hidden;
+    }
+
+    .user-header {
+        background: var(--primary-color);
+        color: white;
+        padding: 1.5rem;
+        font-size: 1.2rem;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .user-header i {
+        font-size: 1.5rem;
+    }
+
+    .user-body {
+        padding: 1.5rem;
+    }
+
+    .user-info {
+        margin-bottom: 1.5rem;
+    }
+
+    .info-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 0.5rem;
+        color: var(--dark-color);
+    }
+
+    .info-item i {
+        color: var(--secondary-color);
+        width: 20px;
+        text-align: center;
+    }
+
+    .form-group {
+        margin-bottom: 1rem;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: var(--dark-color);
+        font-weight: 500;
+    }
+
+    .form-group select {
+        width: 100%;
+        padding: 0.5rem;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        background: white;
+        color: var(--dark-color);
+    }
+
+    .form-group select:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 2px rgba(220, 53, 69, 0.25);
+    }
+
+    .user-actions {
+        display: flex;
+        gap: 1rem;
+    }
+
+    .btn-action {
+        flex: 1;
+        padding: 0.75rem;
+        border: none;
+        border-radius: 8px;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+    .btn-salvar {
+        background: #28a745;
+        color: white;
+    }
+
+    .btn-salvar:hover {
+        background: #218838;
+        transform: translateY(-2px);
+    }
+
+    .btn-resetar {
+        background: var(--secondary-color);
+        color: white;
+    }
+
+    .btn-resetar:hover {
+        background: #6c757d;
+        transform: translateY(-2px);
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 3rem;
+        color: var(--secondary-color);
+    }
+
+    .empty-state i {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+    }
+
+    .empty-state p {
+        font-size: 1.2rem;
+        margin: 0;
+    }
+
+    .loading-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(255, 255, 255, 0.8);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+        visibility: hidden;
+        opacity: 0;
+        transition: all 0.3s ease;
+    }
+
+    .loading-overlay.active {
+        visibility: visible;
+        opacity: 1;
+    }
+
+    .loading-spinner {
+        width: 50px;
+        height: 50px;
+        border: 5px solid #f3f3f3;
+        border-top: 5px solid var(--primary-color);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Editar Usuários</h1>
+    <a href="{{ url_for('admin_dashboard') }}" class="btn-back">
+        <i class="fas fa-arrow-left"></i>
+        Voltar
+    </a>
+</div>
+
+{% if users %}
+<div class="users-grid">
+    {% for user in users %}
+    <div class="user-card">
+        <div class="user-header">
+            <i class="fas fa-user"></i>
+            {{ user.username }}
+        </div>
+        <div class="user-body">
+            <div class="user-info">
+                <div class="info-item">
+                    <i class="fas fa-gem"></i>
+                    Gemas: {{ user.gemas }}
+                </div>
+                <div class="info-item">
+                    <i class="fas fa-crown"></i>
+                    Cargo Atual: {{ user.cargo.nome if user.cargo else 'Nenhum' }}
+                </div>
+            </div>
+            <form onsubmit="return salvarUsuario(event, {{ user.id }})">
+                <div class="form-group">
+                    <label>Cargo Principal</label>
+                    <select name="cargo" required>
+                        <option value="">Selecione um cargo</option>
+                        {% for cargo in cargos %}
+                        <option value="{{ cargo.id }}" {% if user.cargo_id == cargo.id %}selected{% endif %}>
+                            {{ cargo.nome }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Cargo de Confiança</label>
+                    <select name="cargo_confianca">
+                        <option value="">Nenhum</option>
+                        {% for cargo in cargos_confianca %}
+                        <option value="{{ cargo.id }}" {% if user.cargo_confianca_id == cargo.id %}selected{% endif %}>
+                            {{ cargo.nome }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Cargo Hierárquico</label>
+                    <select name="cargo_hierarquico">
+                        <option value="">Nenhum</option>
+                        {% for cargo in cargos_hierarquicos %}
+                        <option value="{{ cargo.id }}" {% if user.cargo_hierarquico_id == cargo.id %}selected{% endif %}>
+                            {{ cargo.nome }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Áreas</label>
+                    <select name="areas" multiple>
+                        {% for area in areas %}
+                        <option value="{{ area.id }}" {% if area in user.areas %}selected{% endif %}>
+                            {{ area.nome }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="user-actions">
+                    <button type="submit" class="btn-action btn-salvar">
+                        <i class="fas fa-save"></i>
+                        Salvar
+                    </button>
+                    <button type="button" class="btn-action btn-resetar" onclick="resetarSenha({{ user.id }})">
+                        <i class="fas fa-key"></i>
+                        Resetar Senha
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+    <i class="fas fa-users-slash"></i>
+    <p>Não há usuários ativos no sistema</p>
+</div>
+{% endif %}
+
+<div id="loadingOverlay" class="loading-overlay">
+    <div class="loading-spinner"></div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function showLoading() {
+    document.getElementById('loadingOverlay').classList.add('active');
+}
+
+function hideLoading() {
+    document.getElementById('loadingOverlay').classList.remove('active');
+}
+
+async function salvarUsuario(event, id) {
+    event.preventDefault();
+    
+    if (!confirm('Deseja salvar as alterações?')) return false;
+    
+    const form = event.target;
+    const formData = new FormData(form);
+    
+    showLoading();
+    
+    try {
+        const response = await fetch(`/admin/usuarios/editar/${id}`, {
+            method: 'POST',
+            body: formData
+        });
+
+        const data = await response.json();
+        
+        if (response.ok) {
+            alert('Usuário atualizado com sucesso!');
+            location.reload();
+        } else {
+            alert(data.error || 'Erro ao atualizar usuário');
+        }
+    } catch (error) {
+        alert('Erro ao processar a requisição');
+        console.error(error);
+    } finally {
+        hideLoading();
+    }
+    
+    return false;
+}
+
+async function resetarSenha(id) {
+    if (!confirm('Deseja resetar a senha deste usuário para "123"?')) return;
+    
+    showLoading();
+    
+    try {
+        const response = await fetch(`/admin/usuarios/resetar-senha/${id}`, {
+            method: 'POST'
+        });
+
+        const data = await response.json();
+        
+        if (response.ok) {
+            alert('Senha resetada com sucesso!');
+        } else {
+            alert(data.error || 'Erro ao resetar senha');
+        }
+    } catch (error) {
+        alert('Erro ao processar a requisição');
+        console.error(error);
+    } finally {
+        hideLoading();
+    }
+}
+</script>
+{% endblock %} 

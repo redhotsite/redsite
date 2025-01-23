@@ -1,0 +1,358 @@
+{% extends "base.html" %}
+
+{% block title %}RED HOT - Página Inicial{% endblock %}
+
+{% block extra_styles %}
+<style>
+    .home-container {
+        padding: 2rem 0;
+    }
+
+    .welcome-section {
+        text-align: center;
+        margin-bottom: 3rem;
+        padding: 2rem;
+        background: linear-gradient(45deg, var(--bg-darker), var(--bg-dark));
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .welcome-section h1 {
+        font-size: 2.5rem;
+        color: var(--primary-color);
+        margin-bottom: 1rem;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+    }
+
+    .welcome-section p {
+        color: var(--text-color);
+        font-size: 1.1rem;
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    .content-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 2rem;
+        margin-top: 2rem;
+    }
+
+    .news-section {
+        background: var(--bg-darker);
+        border-radius: 15px;
+        padding: 2rem;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .section-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid var(--primary-color);
+    }
+
+    .section-header i {
+        color: var(--primary-color);
+        font-size: 1.5rem;
+        margin-right: 1rem;
+    }
+
+    .section-header h2 {
+        color: var(--text-color);
+        font-size: 1.8rem;
+        margin: 0;
+    }
+
+    .news-grid {
+        display: grid;
+        gap: 1.5rem;
+    }
+
+    .news-card {
+        background: var(--bg-dark);
+        border-radius: 10px;
+        overflow: hidden;
+        transition: transform 0.3s ease;
+        cursor: pointer;
+    }
+
+    .news-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .news-image {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+    }
+
+    .news-content {
+        padding: 1.5rem;
+    }
+
+    .news-title {
+        color: var(--primary-color);
+        font-size: 1.2rem;
+        margin-bottom: 1rem;
+        font-weight: bold;
+    }
+
+    .news-description {
+        color: var(--text-color);
+        font-size: 0.95rem;
+        line-height: 1.6;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .news-meta {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 1px solid var(--border-color);
+        font-size: 0.9rem;
+        color: var(--text-muted);
+    }
+
+    .staff-section {
+        background: var(--bg-darker);
+        border-radius: 15px;
+        padding: 2rem;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .staff-list {
+        display: grid;
+        gap: 1rem;
+    }
+
+    .staff-card {
+        background: var(--bg-dark);
+        border-radius: 8px;
+        padding: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .staff-avatar {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: var(--primary-color);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.2rem;
+    }
+
+    .staff-info h3 {
+        color: var(--text-color);
+        margin: 0;
+        font-size: 1rem;
+    }
+
+    .staff-info p {
+        color: var(--text-muted);
+        margin: 0;
+        font-size: 0.9rem;
+    }
+
+    .news-modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.9);
+        z-index: 1000;
+        padding: 2rem;
+        overflow-y: auto;
+    }
+
+    .modal-content {
+        background: var(--bg-darker);
+        max-width: 800px;
+        margin: 2rem auto;
+        border-radius: 15px;
+        padding: 2rem;
+        position: relative;
+    }
+
+    .modal-close {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        background: none;
+        border: none;
+        color: var(--text-color);
+        font-size: 1.5rem;
+        cursor: pointer;
+        transition: color 0.3s ease;
+    }
+
+    .modal-close:hover {
+        color: var(--primary-color);
+    }
+
+    .modal-image {
+        width: 100%;
+        max-height: 400px;
+        object-fit: cover;
+        border-radius: 10px;
+        margin-bottom: 1.5rem;
+    }
+
+    .modal-title {
+        color: var(--primary-color);
+        font-size: 1.8rem;
+        margin-bottom: 1rem;
+    }
+
+    .modal-description {
+        color: var(--text-color);
+        font-size: 1.1rem;
+        line-height: 1.8;
+        white-space: pre-wrap;
+    }
+
+    @media (max-width: 768px) {
+        .content-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .welcome-section h1 {
+            font-size: 2rem;
+        }
+
+        .section-header h2 {
+            font-size: 1.5rem;
+        }
+
+        .modal-content {
+            margin: 1rem;
+            padding: 1rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="home-container">
+    <div class="welcome-section">
+        <h1><i class="fas fa-fire"></i> Bem-vindo à RED HOT</h1>
+        <p>Sua comunidade exclusiva para conteúdo premium e interações únicas.</p>
+    </div>
+
+    <div class="content-grid">
+        <div class="news-section">
+            <div class="section-header">
+                <i class="fas fa-newspaper"></i>
+                <h2>Notícias e Avisos</h2>
+            </div>
+            <div class="news-grid">
+                {% for noticia in noticias %}
+                <div class="news-card" onclick="showNewsModal('{{ noticia.titulo }}', '{{ noticia.descricao }}', '{{ noticia.foto if noticia.foto else '' }}', '{{ noticia.created_at.strftime('%d/%m/%Y %H:%M') }}')">
+                    {% if noticia.foto %}
+                    <img src="{{ noticia.foto }}" alt="{{ noticia.titulo }}" class="news-image">
+                    {% endif %}
+                    <div class="news-content">
+                        <div class="news-title">{{ noticia.titulo }}</div>
+                        <div class="news-description">{{ noticia.descricao }}</div>
+                        <div class="news-meta">
+                            <span><i class="far fa-clock"></i> {{ noticia.created_at.strftime('%d/%m/%Y %H:%M') }}</span>
+                            {% if noticia.autor %}
+                            <span><i class="far fa-user"></i> {{ noticia.autor.username }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="staff-section">
+            <div class="section-header">
+                <i class="fas fa-users"></i>
+                <h2>Staff Online</h2>
+            </div>
+            <div class="staff-list">
+                {% for staff in staff_online %}
+                <div class="staff-card">
+                    <div class="staff-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="staff-info">
+                        <h3>{{ staff.username }}</h3>
+                        <p>{{ staff.cargo.nome if staff.cargo else 'Membro' }}</p>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="news-modal" id="newsModal">
+    <div class="modal-content">
+        <button class="modal-close" onclick="closeNewsModal()">
+            <i class="fas fa-times"></i>
+        </button>
+        <img src="" alt="" class="modal-image" id="modalImage" style="display: none;">
+        <h2 class="modal-title" id="modalTitle"></h2>
+        <div class="modal-description" id="modalDescription"></div>
+    </div>
+</div>
+
+<script>
+function showNewsModal(title, description, image, date) {
+    const modal = document.getElementById('newsModal');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalDescription = document.getElementById('modalDescription');
+    const modalImage = document.getElementById('modalImage');
+
+    modalTitle.textContent = title;
+    modalDescription.textContent = description;
+
+    if (image && image !== 'None') {
+        modalImage.src = image;
+        modalImage.style.display = 'block';
+    } else {
+        modalImage.style.display = 'none';
+    }
+
+    modal.style.display = 'block';
+    document.body.style.overflow = 'hidden';
+}
+
+function closeNewsModal() {
+    const modal = document.getElementById('newsModal');
+    modal.style.display = 'none';
+    document.body.style.overflow = 'auto';
+}
+
+// Fechar modal ao clicar fora
+window.onclick = function(event) {
+    const modal = document.getElementById('newsModal');
+    if (event.target == modal) {
+        closeNewsModal();
+    }
+}
+
+// Fechar modal com tecla ESC
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+        closeNewsModal();
+    }
+});
+</script>
+{% endblock %} 

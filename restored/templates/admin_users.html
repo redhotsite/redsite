@@ -1,0 +1,662 @@
+{% extends "admin_base.html" %}
+
+{% block title %}RED HOT - Gerenciamento de Usuários{% endblock %}
+
+{% block header_title %}
+<div style="display: flex; align-items: center; gap: 20px;">
+    <a href="{{ url_for('admin_dashboard') }}" class="btn-back">
+        <i class="fas fa-arrow-left"></i> Voltar ao Painel
+    </a>
+    <span>Gerenciamento de Usuários</span>
+</div>
+{% endblock %}
+
+{% block extra_styles %}
+<style>
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    .section {
+        background: #151515;
+        border: 1px solid #222;
+        border-radius: 8px;
+        padding: 25px;
+        margin-bottom: 30px;
+    }
+
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .section-title {
+        color: #ff0000;
+        margin: 0;
+        font-size: 24px;
+    }
+
+    .filters-section {
+        background: #1a1a1a;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+    }
+
+    .filters-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+    }
+
+    .filter-group {
+        margin-bottom: 10px;
+    }
+
+    .filter-group label {
+        display: block;
+        color: #fff;
+        margin-bottom: 5px;
+        font-size: 0.9em;
+    }
+
+    .filter-control {
+        width: 100%;
+        padding: 8px;
+        background: #222;
+        border: 1px solid #333;
+        border-radius: 4px;
+        color: #fff;
+    }
+
+    .filter-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 15px;
+    }
+
+    .table-container {
+        overflow-x: auto;
+    }
+
+    .table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+
+    .table th,
+    .table td {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 1px solid #222;
+    }
+
+    .table th {
+        background: #222;
+        color: #ff0000;
+        font-weight: 600;
+    }
+
+    .table tbody tr:hover {
+        background: #1a1a1a;
+    }
+
+    .table td {
+        color: #fff;
+    }
+
+    .actions {
+        display: flex;
+        gap: 10px;
+    }
+
+    .btn {
+        padding: 8px 15px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary {
+        background: #ff0000;
+        color: white;
+    }
+
+    .btn-secondary {
+        background: #333;
+        color: white;
+    }
+
+    .btn:hover {
+        transform: translateY(-2px);
+        opacity: 0.9;
+    }
+
+    .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        z-index: 1000;
+    }
+
+    .modal-content {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: #151515;
+        padding: 25px;
+        border-radius: 8px;
+        width: 90%;
+        max-width: 600px;
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        position: sticky;
+        top: 0;
+        background: #151515;
+        padding: 10px 0;
+        z-index: 1;
+    }
+
+    .modal-title {
+        color: #ff0000;
+        margin: 0;
+        font-size: 20px;
+    }
+
+    .close-modal {
+        background: none;
+        border: none;
+        color: #fff;
+        font-size: 24px;
+        cursor: pointer;
+    }
+
+    .close-modal:hover {
+        color: #ff0000;
+    }
+
+    .form-section {
+        margin-bottom: 20px;
+        padding: 15px;
+        background: #1a1a1a;
+        border-radius: 8px;
+    }
+
+    .form-section-title {
+        color: #ff0000;
+        margin-bottom: 15px;
+        font-size: 16px;
+    }
+
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 5px;
+        color: #fff;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 8px;
+        background: #222;
+        border: 1px solid #333;
+        border-radius: 4px;
+        color: #fff;
+    }
+
+    .form-control:focus {
+        border-color: #ff0000;
+        outline: none;
+    }
+
+    .badge {
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .badge-dev { background: #ff0000; color: white; }
+    .badge-admin { background: #ff4444; color: white; }
+    .badge-red-lider { background: #ff6666; color: white; }
+    .badge-normal { background: #333; color: white; }
+
+    .areas-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+        margin-top: 5px;
+    }
+
+    .area-tag {
+        background: #222;
+        color: #fff;
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-size: 12px;
+    }
+
+    .checkbox-group {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 10px;
+        margin-top: 10px;
+    }
+
+    .checkbox-item {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .checkbox-item input[type="checkbox"] {
+        width: 16px;
+        height: 16px;
+        cursor: pointer;
+    }
+
+    .checkbox-item label {
+        margin: 0;
+        cursor: pointer;
+    }
+
+    .gemas-section {
+        display: flex;
+        gap: 15px;
+        align-items: center;
+    }
+
+    .gemas-count {
+        background: #222;
+        padding: 5px 10px;
+        border-radius: 4px;
+        color: #ffd700;
+        font-weight: bold;
+    }
+
+    .gemas-actions {
+        display: flex;
+        gap: 10px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="section">
+        <div class="section-header">
+            <h2 class="section-title">Usuários</h2>
+        </div>
+
+        <!-- Filtros -->
+        <div class="filters-section">
+            <form id="filterForm" onsubmit="return applyFilters(event)">
+                <div class="filters-grid">
+                    <div class="filter-group">
+                        <label for="filterUsername">Nome de Usuário</label>
+                        <input type="text" id="filterUsername" class="filter-control" placeholder="Buscar por username">
+                    </div>
+                    <div class="filter-group">
+                        <label for="filterCargo">Cargo</label>
+                        <select id="filterCargo" class="filter-control">
+                            <option value="">Todos</option>
+                            {% for cargo in cargos %}
+                            <option value="{{ cargo.id }}">{{ cargo.nome }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="filterCargoGema">Cargo por Gemas</label>
+                        <select id="filterCargoGema" class="filter-control">
+                            <option value="">Todos</option>
+                            {% for cargo in cargos_gemas %}
+                            <option value="{{ cargo.id }}">{{ cargo.nome }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="filterCargoConfianca">Cargo de Confiança</label>
+                        <select id="filterCargoConfianca" class="filter-control">
+                            <option value="">Todos</option>
+                            {% for cargo in cargos_confianca %}
+                            <option value="{{ cargo.id }}">{{ cargo.nome }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="filter-actions">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-search"></i> Filtrar
+                    </button>
+                    <button type="button" class="btn btn-secondary" onclick="resetFilters()">
+                        <i class="fas fa-undo"></i> Limpar Filtros
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <div class="table-container">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Usuário</th>
+                        <th>Cargo</th>
+                        <th>Cargo por Gemas</th>
+                        <th>Cargos de Confiança</th>
+                        <th>Gemas</th>
+                        <th>Áreas</th>
+                        <th>Status</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                    <tr>
+                        <td>{{ user.username }}</td>
+                        <td>
+                            <span class="badge {% if user.cargo.nivel <= 2 %}badge-dev{% elif user.cargo.nivel <= 5 %}badge-admin{% else %}badge-normal{% endif %}">
+                                {{ user.cargo.nome }}
+                            </span>
+                        </td>
+                        <td>{{ user.cargo_gema.nome if user.cargo_gema else '-' }}</td>
+                        <td>
+                            <div class="areas-list">
+                                {% for cargo in user.cargos_confianca %}
+                                <span class="area-tag">{{ cargo.nome }}</span>
+                                {% endfor %}
+                                {% if not user.cargos_confianca %}
+                                -
+                                {% endif %}
+                            </div>
+                        </td>
+                        <td>
+                            <div class="gemas-count">
+                                <i class="fas fa-gem"></i> {{ user.total_gemas }}
+                            </div>
+                        </td>
+                        <td>
+                            <div class="areas-list">
+                                {% for area in user.areas %}
+                                <span class="area-tag">{{ area.nome }}</span>
+                                {% endfor %}
+                            </div>
+                        </td>
+                        <td>
+                            <span class="badge {% if user.is_active %}badge-dev{% else %}badge-normal{% endif %}">
+                                {{ 'Ativo' if user.is_active else 'Inativo' }}
+                            </span>
+                        </td>
+                        <td class="actions">
+                            <button class="btn btn-secondary" onclick="editUser({{ user.id }})">
+                                <i class="fas fa-edit"></i> Editar
+                            </button>
+                            {% if user.is_active %}
+                            <button class="btn btn-primary" onclick="toggleUserStatus({{ user.id }}, false)">
+                                <i class="fas fa-ban"></i> Banir
+                            </button>
+                            {% else %}
+                            <button class="btn btn-secondary" onclick="toggleUserStatus({{ user.id }}, true)">
+                                <i class="fas fa-undo"></i> Desbanir
+                            </button>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Edição -->
+<div id="editModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title">Editar Usuário</h3>
+            <button class="close-modal" onclick="closeModal()">&times;</button>
+        </div>
+        
+        <form id="editForm" onsubmit="return saveUser(event)">
+            <input type="hidden" id="userId" name="user_id">
+            
+            <!-- Cargos Hierárquicos -->
+            <div class="form-section">
+                <h4 class="form-section-title">Cargo Hierárquico</h4>
+                <div class="form-group">
+                    <label for="cargo">Selecione o Cargo</label>
+                    <select id="cargo" name="cargo_id" class="form-control" required>
+                        {% for cargo in cargos %}
+                        <option value="{{ cargo.id }}">{{ cargo.nome }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <!-- Cargos por Gemas -->
+            <div class="form-section">
+                <h4 class="form-section-title">Cargo por Gemas</h4>
+                <div class="form-group">
+                    <label for="cargoGema">Cargo por Gemas</label>
+                    <select id="cargoGema" name="cargo_gema_id" class="form-control">
+                        <option value="">Nenhum</option>
+                        {% for cargo in cargos_gemas %}
+                        <option value="{{ cargo.id }}">{{ cargo.nome }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="gemas-section">
+                    <div class="gemas-count">
+                        <i class="fas fa-gem"></i> <span id="gemasCount">0</span>
+                    </div>
+                    <div class="form-group" style="margin: 0 15px;">
+                        <input type="number" id="gemasQuantidade" class="form-control" value="1" min="1" style="width: 80px;">
+                    </div>
+                    <div class="gemas-actions">
+                        <button type="button" class="btn btn-secondary" onclick="adjustGemas('add')">
+                            <i class="fas fa-plus"></i> Adicionar
+                        </button>
+                        <button type="button" class="btn btn-primary" onclick="adjustGemas('remove')">
+                            <i class="fas fa-minus"></i> Remover
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cargo de Confiança -->
+            <div class="form-section">
+                <h4 class="form-section-title">Cargos de Confiança</h4>
+                <div class="checkbox-group">
+                    {% for cargo in cargos_confianca %}
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="cargoConfianca{{ cargo.id }}" name="cargos_confianca" value="{{ cargo.id }}">
+                        <label for="cargoConfianca{{ cargo.id }}">{{ cargo.nome }}</label>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Áreas -->
+            <div class="form-section">
+                <h4 class="form-section-title">Áreas</h4>
+                <div class="checkbox-group">
+                    {% for area in areas %}
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="area{{ area.id }}" name="areas" value="{{ area.id }}">
+                        <label for="area{{ area.id }}">{{ area.nome }}</label>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save"></i> Salvar Alterações
+            </button>
+        </form>
+    </div>
+</div>
+
+<script>
+function applyFilters(event) {
+    event.preventDefault();
+    const username = document.getElementById('filterUsername').value;
+    const cargo = document.getElementById('filterCargo').value;
+    const cargoGema = document.getElementById('filterCargoGema').value;
+    const cargoConfianca = document.getElementById('filterCargoConfianca').value;
+
+    // Construir URL com os filtros
+    let url = new URL(window.location.href);
+    url.searchParams.set('username', username);
+    if (cargo) url.searchParams.set('cargo', cargo);
+    if (cargoGema) url.searchParams.set('cargo_gema', cargoGema);
+    if (cargoConfianca) url.searchParams.set('cargo_confianca', cargoConfianca);
+
+    window.location.href = url.toString();
+    return false;
+}
+
+function resetFilters() {
+    window.location.href = window.location.pathname;
+}
+
+function editUser(userId) {
+    document.getElementById('userId').value = userId;
+    document.getElementById('editModal').style.display = 'block';
+    
+    // Carregar dados do usuário
+    fetch(`/admin/get_user/${userId}`)
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('cargo').value = data.cargo_id || '';
+            document.getElementById('cargoGema').value = data.cargo_gema_id || '';
+            
+            // Marcar cargos de confiança
+            const cargosConfiancaCheckboxes = document.querySelectorAll('input[name="cargos_confianca"]');
+            cargosConfiancaCheckboxes.forEach(checkbox => {
+                checkbox.checked = data.cargos_confianca.includes(parseInt(checkbox.value));
+            });
+            
+            document.getElementById('gemasCount').textContent = data.total_gemas;
+            
+            // Marcar áreas
+            const areaCheckboxes = document.querySelectorAll('input[name="areas"]');
+            areaCheckboxes.forEach(checkbox => {
+                checkbox.checked = data.areas.includes(parseInt(checkbox.value));
+            });
+        });
+}
+
+function closeModal() {
+    document.getElementById('editModal').style.display = 'none';
+}
+
+function saveUser(event) {
+    event.preventDefault();
+    const formData = new FormData(event.target);
+    const userId = document.getElementById('userId').value;
+
+    fetch(`/admin/user/${userId}/update_cargo`, {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        } else {
+            alert(data.message || 'Erro ao salvar alterações');
+        }
+    })
+    .catch(error => {
+        console.error('Erro:', error);
+        alert('Erro ao salvar alterações');
+    });
+
+    return false;
+}
+
+function adjustGemas(action) {
+    const userId = document.getElementById('userId').value;
+    const quantidade = parseInt(document.getElementById('gemasQuantidade').value) || 1;
+
+    // Criar FormData
+    const formData = new FormData();
+    formData.append('quantidade', quantidade);
+
+    fetch(`/admin/user/${userId}/${action}_gemas`, {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            document.getElementById('gemasCount').textContent = data.total_gemas;
+            // Atualizar também o valor na tabela
+            location.reload();
+        } else {
+            alert(data.message || 'Erro ao ajustar gemas');
+        }
+    })
+    .catch(error => {
+        console.error('Erro:', error);
+        alert('Erro ao ajustar gemas');
+    });
+}
+
+function toggleUserStatus(userId, newStatus) {
+    if (!confirm(`Deseja ${newStatus ? 'desbanir' : 'banir'} este usuário?`)) return;
+
+    fetch(`/admin/user/${userId}/toggle_status`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ is_active: newStatus })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        } else {
+            alert(data.message || 'Erro ao alterar status do usuário');
+        }
+    })
+    .catch(error => {
+        console.error('Erro:', error);
+        alert('Erro ao alterar status do usuário');
+    });
+}
+
+// Fechar modal ao clicar fora
+window.onclick = function(event) {
+    const modal = document.getElementById('editModal');
+    if (event.target === modal) {
+        closeModal();
+    }
+}
+</script>
+{% endblock %} 

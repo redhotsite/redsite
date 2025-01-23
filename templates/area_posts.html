@@ -1,0 +1,434 @@
+{% extends "base.html" %}
+
+{% block title %}RED HOT - {{ area.nome }}{% endblock %}
+
+{% block content %}
+<!-- Modal para post completo -->
+<div id="postModal" class="post-modal">
+    <div class="post-modal-content">
+        <span class="post-modal-close">&times;</span>
+        <h2 id="modalTitle" class="modal-title"></h2>
+        <div class="modal-image-container">
+            <img id="modalImage" class="modal-image" onclick="expandModalImage(this)">
+        </div>
+        <div class="modal-description" id="modalDescription"></div>
+        <div class="modal-meta">
+            <span id="modalAuthor" class="modal-author"></span>
+            <span id="modalDate" class="modal-date"></span>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para imagem expandida -->
+<div id="imageModal" class="image-modal">
+    <span class="image-modal-close">&times;</span>
+    <img class="image-modal-content" id="expandedImage">
+</div>
+
+<div class="area-posts-container">
+    <div class="area-header">
+        <h1>{{ area.nome }}</h1>
+    </div>
+
+    <div class="posts-list">
+        {% if posts %}
+            {% for post in posts %}
+            <div class="post-card" onclick="showPost('{{ post.titulo }}', '{{ post.foto }}', '{{ post.descricao|replace('\n', '<br>')|safe }}', '{{ post.autor.username }}', '{{ post.created_at.strftime('%d/%m/%Y') }}')">
+                <div class="post-main-content">
+                    <div class="post-text-content">
+                        <h2 class="post-title">{{ post.titulo }}</h2>
+                        <p class="post-description">{{ post.descricao }}</p>
+                        <div class="post-meta">
+                            <span class="post-author">
+                                <i class="fas fa-user"></i> {{ post.autor.username }}
+                            </span>
+                            <span class="post-date">
+                                <i class="fas fa-calendar"></i> {{ post.created_at.strftime('%d/%m/%Y') }}
+                            </span>
+                        </div>
+                    </div>
+                    {% if post.foto %}
+                    <div class="post-image">
+                        <img src="{{ post.foto }}" alt="Imagem do post">
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="no-posts">
+                <p>Nenhum post disponível</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+var postModal = document.getElementById("postModal");
+var imageModal = document.getElementById("imageModal");
+var expandedImg = document.getElementById("expandedImage");
+
+function showPost(title, image, description, author, date) {
+    document.getElementById("modalTitle").textContent = title;
+    document.getElementById("modalImage").src = image;
+    document.getElementById("modalDescription").innerHTML = description.replace(/\n/g, '<br>');
+    document.getElementById("modalAuthor").innerHTML = '<i class="fas fa-user"></i> ' + author;
+    document.getElementById("modalDate").innerHTML = '<i class="fas fa-calendar"></i> ' + date;
+    postModal.style.display = "block";
+    document.body.style.overflow = "hidden";
+}
+
+function expandModalImage(img) {
+    imageModal.style.display = "flex";
+    expandedImg.src = img.src;
+}
+
+// Fechar modais
+document.getElementsByClassName("post-modal-close")[0].onclick = function() {
+    postModal.style.display = "none";
+    document.body.style.overflow = "auto";
+}
+
+document.getElementsByClassName("image-modal-close")[0].onclick = function() {
+    imageModal.style.display = "none";
+}
+
+window.onclick = function(event) {
+    if (event.target == postModal) {
+        postModal.style.display = "none";
+        document.body.style.overflow = "auto";
+    }
+    if (event.target == imageModal) {
+        imageModal.style.display = "none";
+    }
+}
+
+document.addEventListener('keydown', function(event) {
+    if (event.key === "Escape") {
+        postModal.style.display = "none";
+        imageModal.style.display = "none";
+        document.body.style.overflow = "auto";
+    }
+});
+</script>
+{% endblock %}
+
+{% block extra_styles %}
+<style>
+    body {
+        background-color: #0f0f0f;
+        margin: 0;
+        padding: 0;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .area-posts-container {
+        max-width: 1200px;
+        width: 95%;
+        margin: 80px auto 40px;
+        min-height: calc(100vh - 200px);
+        display: flex;
+        flex-direction: column;
+    }
+
+    .area-header {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+
+    .area-header h1 {
+        color: #ff0000;
+        font-size: 2em;
+        margin: 0;
+        font-weight: 300;
+        letter-spacing: 1.5px;
+    }
+
+    .posts-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 20px;
+        padding: 20px 0;
+    }
+
+    .post-card {
+        background: #1a1a1a;
+        border-radius: 8px;
+        overflow: hidden;
+        transition: transform 0.2s, box-shadow 0.2s;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        cursor: pointer;
+        height: 320px;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .post-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    .post-main-content {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        padding: 15px;
+    }
+
+    .post-text-content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .post-title {
+        color: #fff;
+        font-size: 1.2em;
+        margin: 0 0 10px 0;
+        font-weight: 500;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        max-width: 100%;
+    }
+
+    .post-description {
+        color: #bbb;
+        font-size: 0.9em;
+        line-height: 1.5;
+        margin: 0 0 15px 0;
+        overflow: hidden;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        flex: 1;
+    }
+
+    .post-meta {
+        display: flex;
+        justify-content: space-between;
+        color: #666;
+        font-size: 0.85em;
+        padding-top: 10px;
+        border-top: 1px solid #222;
+    }
+
+    .post-author, .post-date {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .post-image {
+        width: 100%;
+        height: 160px;
+        border-radius: 4px;
+        overflow: hidden;
+        margin-bottom: 15px;
+    }
+
+    .post-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.3s;
+    }
+
+    .post-card:hover .post-image img {
+        transform: scale(1.05);
+    }
+
+    .no-posts {
+        text-align: center;
+        padding: 40px;
+        background: #1a1a1a;
+        border-radius: 8px;
+        color: #666;
+    }
+
+    /* Modal do Post */
+    .post-modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100vh;
+        background-color: #0f0f0f;
+        overflow-y: auto;
+    }
+
+    .post-modal-content {
+        position: relative;
+        background-color: #0f0f0f;
+        min-height: 100vh;
+        width: 100%;
+        max-width: 100%;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .post-modal-close {
+        position: fixed;
+        top: 20px;
+        right: 30px;
+        color: #fff;
+        font-size: 40px;
+        cursor: pointer;
+        transition: color 0.2s;
+        z-index: 1200;
+    }
+
+    .post-modal-close:hover {
+        color: #ff0000;
+    }
+
+    .modal-title {
+        color: #ff0000;
+        font-size: 2.4em;
+        padding: 80px 20px 30px;
+        margin: 0;
+        font-weight: 300;
+        text-align: center;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        max-width: 1200px;
+        margin: 0 auto;
+        width: 90%;
+    }
+
+    .modal-image-container {
+        width: 100%;
+        text-align: center;
+        background: #000;
+        padding: 40px 0;
+        cursor: pointer;
+    }
+
+    .modal-image {
+        max-width: 90%;
+        max-height: 80vh;
+        object-fit: contain;
+        transition: transform 0.3s;
+    }
+
+    .modal-image:hover {
+        transform: scale(1.02);
+    }
+
+    .modal-description {
+        color: #fff;
+        font-size: 1.2em;
+        line-height: 1.8;
+        padding: 40px 0;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        max-width: 1200px;
+        margin: 0 auto;
+        width: 90%;
+        text-align: justify;
+    }
+
+    .modal-meta {
+        display: flex;
+        justify-content: space-between;
+        color: #666;
+        font-size: 1em;
+        padding: 20px 0 40px;
+        border-top: 1px solid #222;
+        max-width: 1200px;
+        margin: 0 auto;
+        width: 90%;
+    }
+
+    .modal-author, .modal-date {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    /* Modal da Imagem */
+    .image-modal {
+        display: none;
+        position: fixed;
+        z-index: 1100;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.98);
+        justify-content: center;
+        align-items: center;
+    }
+
+    .image-modal-content {
+        max-width: 95%;
+        max-height: 95vh;
+        object-fit: contain;
+    }
+
+    .image-modal-close {
+        position: absolute;
+        top: 15px;
+        right: 25px;
+        color: #fff;
+        font-size: 35px;
+        cursor: pointer;
+        transition: color 0.2s;
+    }
+
+    .image-modal-close:hover {
+        color: #ff0000;
+    }
+
+    @media (max-width: 768px) {
+        .area-posts-container {
+            margin: 60px auto 20px;
+        }
+
+        .posts-list {
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .post-card {
+            height: 300px;
+        }
+
+        .post-image {
+            height: 140px;
+        }
+
+        .modal-title {
+            font-size: 1.8em;
+            padding: 60px 15px 20px;
+        }
+
+        .modal-image-container {
+            padding: 20px 0;
+        }
+
+        .modal-image {
+            max-width: 95%;
+        }
+
+        .modal-description {
+            font-size: 1.1em;
+            padding: 30px 15px;
+        }
+
+        .post-modal-close {
+            top: 15px;
+            right: 20px;
+            font-size: 35px;
+        }
+    }
+</style>
+{% endblock %} 

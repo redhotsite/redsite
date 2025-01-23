@@ -1,0 +1,163 @@
+{% extends "area_18_base.html" %}
+
+{% block section_title %}Conteúdo Premium +18{% endblock %}
+
+{% block section_header %}Conteúdo Premium +18{% endblock %}
+
+{% block section_styles %}
+.post-card {
+    position: relative;
+    overflow: hidden;
+}
+
+.premium-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: #ffd700;
+    color: #000;
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-size: 0.8em;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    z-index: 1;
+}
+
+.premium-badge i {
+    color: #000;
+}
+
+.post-image {
+    transition: transform 0.3s ease, filter 0.3s ease;
+}
+
+.post-card:hover .post-image {
+    transform: scale(1.05);
+    filter: brightness(1.1);
+}
+
+.post-content {
+    position: relative;
+    z-index: 1;
+}
+
+.premium-features {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #222;
+}
+
+.feature-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.feature-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #ffd700;
+    margin-bottom: 8px;
+    font-size: 0.9em;
+}
+
+.feature-item i {
+    font-size: 1.1em;
+}
+
+.unlock-btn {
+    display: inline-block;
+    margin-top: 15px;
+    padding: 8px 20px;
+    background: #ffd700;
+    color: #000;
+    text-decoration: none;
+    border-radius: 20px;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+.unlock-btn:hover {
+    background: #ffed4a;
+    transform: translateY(-2px);
+    text-decoration: none;
+    color: #000;
+}
+
+.unlock-btn i {
+    margin-right: 5px;
+}
+{% endblock %}
+
+{% block content %}
+<div class="area-18-container">
+    <div class="warning-banner">
+        ⚠️ Área restrita para maiores de 18 anos. Todo o conteúdo aqui é sensível e explícito.
+    </div>
+
+    <div class="btn-container">
+        <a href="{{ url_for('area_18') }}" class="btn-back">
+            <i class="fas fa-arrow-left"></i> Voltar para Área +18
+        </a>
+    </div>
+
+    {% if posts %}
+    <div class="posts-grid">
+        {% for post in posts %}
+        <div class="post-card">
+            <div class="premium-badge">
+                <i class="fas fa-crown"></i>
+                PREMIUM
+            </div>
+            <div class="post-header">
+                <h3 class="post-title">{{ post.titulo }}</h3>
+            </div>
+            {% if post.foto %}
+            <img src="{{ post.foto }}" alt="{{ post.titulo }}" class="post-image">
+            {% endif %}
+            <div class="post-content">
+                <div class="post-description">{{ post.descricao|safe }}</div>
+                <div class="premium-features">
+                    <ul class="feature-list">
+                        <li class="feature-item">
+                            <i class="fas fa-check-circle"></i>
+                            Conteúdo Exclusivo
+                        </li>
+                        <li class="feature-item">
+                            <i class="fas fa-check-circle"></i>
+                            Alta Qualidade
+                        </li>
+                        <li class="feature-item">
+                            <i class="fas fa-check-circle"></i>
+                            Sem Anúncios
+                        </li>
+                    </ul>
+                    <a href="#" class="unlock-btn">
+                        <i class="fas fa-lock-open"></i>
+                        Desbloquear Conteúdo
+                    </a>
+                </div>
+                <div class="post-meta">
+                    <div class="post-author">
+                        <i class="fas fa-user"></i>
+                        {{ post.autor.username }}
+                    </div>
+                    <div class="post-date">
+                        {{ post.created_at.strftime('%d/%m/%Y %H:%M') }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-message">
+        Nenhum conteúdo premium disponível no momento.
+    </div>
+    {% endif %}
+</div>
+{% endblock %} 

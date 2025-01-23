@@ -1,0 +1,26 @@
+# Arquivos de configuração com dados sensíveis
+github_config.json
+
+# Arquivos de backup
+*.zip
+backups/
+
+# Arquivos do Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Ambiente virtual
+venv/
+env/
+
+# Banco de dados
+*.db
+*.sqlite3
+
+# Logs
+*.log
+
+# Arquivos do sistema
+.DS_Store
+Thumbs.db

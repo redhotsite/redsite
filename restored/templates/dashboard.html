@@ -1,0 +1,262 @@
+{% extends "base.html" %}
+
+{% block title %}RED HOT - Dashboard{% endblock %}
+
+{% block extra_styles %}
+<style>
+    .dashboard-container {
+        padding: 30px;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .welcome-section {
+        background: var(--bg-darker);
+        border-radius: 10px;
+        padding: 30px;
+        margin-bottom: 30px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        border: 1px solid var(--border-color);
+    }
+
+    .welcome-title {
+        color: var(--primary-color);
+        font-size: 32px;
+        margin-bottom: 20px;
+        font-weight: 600;
+    }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 30px;
+        margin-bottom: 30px;
+    }
+
+    .info-card {
+        background: var(--bg-darker);
+        border-radius: 10px;
+        padding: 25px;
+        border: 1px solid var(--border-color);
+    }
+
+    .info-card-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 15px;
+        gap: 10px;
+    }
+
+    .info-card-header i {
+        color: var(--primary-color);
+        font-size: 24px;
+    }
+
+    .info-card-title {
+        color: var(--text-color);
+        font-size: 18px;
+        font-weight: 500;
+        margin: 0;
+    }
+
+    .info-card-content {
+        color: var(--text-color);
+    }
+
+    .cargo-badge {
+        display: inline-flex;
+        align-items: center;
+        background: var(--primary-color);
+        color: white;
+        padding: 8px 15px;
+        border-radius: 20px;
+        font-size: 14px;
+        font-weight: 500;
+        margin-top: 10px;
+    }
+
+    .cargo-badge i {
+        margin-right: 8px;
+    }
+
+    .gem-info {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 10px;
+    }
+
+    .gem-icon {
+        color: var(--primary-color);
+        font-size: 20px;
+    }
+
+    .gem-count {
+        font-size: 16px;
+        color: var(--text-color);
+    }
+
+    .areas-section {
+        background: var(--bg-darker);
+        border-radius: 10px;
+        padding: 25px;
+        margin-top: 30px;
+        border: 1px solid var(--border-color);
+    }
+
+    .areas-title {
+        color: var(--text-color);
+        font-size: 20px;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .areas-title i {
+        color: var(--primary-color);
+    }
+
+    .areas-list {
+        color: var(--text-muted);
+        font-size: 16px;
+        margin: 0;
+        padding-left: 20px;
+    }
+
+    .no-areas {
+        color: var(--text-muted);
+        font-style: italic;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 15px;
+        margin-top: 30px;
+        flex-wrap: wrap;
+    }
+
+    .action-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 20px;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 500;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        border: none;
+        cursor: pointer;
+    }
+
+    .btn-admin {
+        background-color: var(--primary-color);
+        color: white;
+    }
+
+    .btn-admin:hover {
+        background-color: var(--primary-hover);
+        transform: translateY(-2px);
+    }
+
+    .btn-logout {
+        background-color: var(--bg-light);
+        color: var(--text-color);
+    }
+
+    .btn-logout:hover {
+        background-color: var(--border-color);
+        transform: translateY(-2px);
+    }
+
+    @media (max-width: 768px) {
+        .dashboard-container {
+            padding: 15px;
+        }
+
+        .welcome-title {
+            font-size: 24px;
+        }
+
+        .action-buttons {
+            flex-direction: column;
+        }
+
+        .action-btn {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <div class="welcome-section">
+        <h1 class="welcome-title">Bem-vindo, {{ user.username }}!</h1>
+        
+        <div class="info-grid">
+            <div class="info-card">
+                <div class="info-card-header">
+                    <i class="fas fa-user-shield"></i>
+                    <h3 class="info-card-title">Cargo Hierárquico</h3>
+                </div>
+                <div class="info-card-content">
+                    {% if user.cargo %}
+                        <div class="cargo-badge">
+                            <i class="fas fa-star"></i>
+                            {{ user.cargo.nome }}
+                        </div>
+                    {% else %}
+                        <span class="no-cargo">Sem cargo atribuído</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="info-card">
+                <div class="info-card-header">
+                    <i class="fas fa-gem"></i>
+                    <h3 class="info-card-title">Cargo por Gemas</h3>
+                </div>
+                <div class="info-card-content">
+                    <div>{{ cargo_gemas if cargo_gemas else "Sem cargo" }}</div>
+                    <div class="gem-info">
+                        <i class="fas fa-gem gem-icon"></i>
+                        <span class="gem-count">({{ user.total_gemas }} gemas)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="areas-section">
+            <h3 class="areas-title">
+                <i class="fas fa-map-marker-alt"></i>
+                Suas Áreas
+            </h3>
+            {% if user.areas %}
+                <ul class="areas-list">
+                    {% for area in user.areas %}
+                        <li>{{ area.nome }}</li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="no-areas">Nenhuma área atribuída</p>
+            {% endif %}
+        </div>
+
+        <div class="action-buttons">
+            {% if has_admin_access(user) %}
+                <a href="{{ url_for('admin_dashboard') }}" class="action-btn btn-admin">
+                    <i class="fas fa-cog"></i>
+                    Painel Administrativo
+                </a>
+            {% endif %}
+            <a href="{{ url_for('logout') }}" class="action-btn btn-logout">
+                <i class="fas fa-sign-out-alt"></i>
+                Sair
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %} 
